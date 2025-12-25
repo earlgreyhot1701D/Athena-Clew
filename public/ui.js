@@ -132,10 +132,10 @@ const UI = {
                     <h3 class="font-headline font-bold text-navy text-xl mb-4">Step 4: Ranked Solutions</h3>
                     ${solutionsHtml}
                     <div class="mt-4 flex gap-2">
-                        <button class="flex-1 bg-navy text-white font-headline font-bold py-2 hover:bg-navy/90 border-2 border-navy">
+                        <button onclick="window.app.handleHelpfulFeedback()" class="flex-1 bg-navy text-white font-headline font-bold py-2 hover:bg-navy/90 border-2 border-navy transition">
                             This Helped! (Store Principle)
                         </button>
-                        <button class="flex-1 bg-transparent border-2 border-navy text-navy font-headline font-bold py-2 hover:bg-navy/5">
+                        <button onclick="window.app.handleTryAnother()" class="flex-1 bg-transparent border-2 border-navy text-navy font-headline font-bold py-2 hover:bg-navy/5 transition">
                             Try Another
                         </button>
                     </div>
@@ -228,25 +228,8 @@ const UI = {
      * Show feedback buttons
      */
     showFeedbackButtons() {
-        if (!this.elements.results) return;
-
-        const html = `
-      <div class="mt-6 flex gap-3">
-        <button 
-          onclick="window.app.handleHelpfulFeedback()"
-          class="flex-1 bg-amber text-navy font-headline font-bold py-3 px-6 uppercase hover:bg-amber/90 border-3 border-amber transition rounded shadow-craft"
-        >
-          ✅ This Helped! (Learn Principle)
-        </button>
-        <button 
-          onclick="window.app.handleTryAnother()"
-          class="flex-1 bg-transparent border-3 border-navy text-navy font-headline font-bold py-3 px-6 uppercase hover:bg-navy/5 transition rounded"
-        >
-          🔄 Try Another
-        </button>
-      </div>
-    `;
-        this.elements.results.insertAdjacentHTML('beforeend', html);
+        // Buttons are now integrated into Step 4 display (displaySolutions)
+        // to maintain UI consistency and visual hierarchy.
     },
 
     /**
