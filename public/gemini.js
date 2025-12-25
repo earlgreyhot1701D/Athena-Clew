@@ -41,7 +41,22 @@ const Gemini = {
      * @returns {Promise<object>} {classification, rootCause, confidence, thinkingTokens}
      */
     async analyzeError(errorData) {
-        if (!this.model) this.init();
+        if (!this.model) {
+            try { this.init(); } catch (e) { console.warn('Gemini auto-init failed, using fallback.'); }
+        }
+
+        if (!this.model) {
+            // Immediate fallback if init failed
+            return {
+                classification: this._fallbackClassification(errorData.message),
+                rootCause: 'Analysis failed - SDK unavailable',
+                patterns: [],
+                confidence: 0.3,
+                thinkingTokens: 0,
+                responseTime: 0,
+                error: 'SDK not loaded'
+            };
+        }
 
         const prompt = `You are an expert debugging assistant. Analyze this error deeply and classify it.
   

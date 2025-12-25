@@ -14,8 +14,9 @@ const App = {
     async init() {
         try {
             // Wait for Vertex AI SDK (Module script race condition)
+            // Increased to 50 attempts (5 seconds) for slower connections
             let attempts = 0;
-            while (!window.getGenerativeModel && attempts < 20) {
+            while (!window.getGenerativeModel && attempts < 50) {
                 await new Promise(r => setTimeout(r, 100)); // Wait 100ms
                 attempts++;
             }
@@ -24,8 +25,12 @@ const App = {
                 console.warn('Vertex AI SDK failed to load in time. AI features will use fallback.');
             }
 
-            // Initialize Gemini
-            if (window.Gemini) window.Gemini.init();
+            // Initialize Gemini (Safe Mode)
+            if (window.Gemini && window.getGenerativeModel) {
+                window.Gemini.init();
+            } else {
+                console.log('ℹ️ Skipping Gemini init - SDK not loaded');
+            }
 
             // Get session
             const sessionId = await getOrCreateSession(); // From session.js
