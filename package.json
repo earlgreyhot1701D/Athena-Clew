@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "test": "jest",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "latest",
+    "jest": "latest"
+  }
+}

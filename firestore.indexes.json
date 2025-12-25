@@ -1,0 +1,19 @@
+{
+    "indexes": [
+        {
+            "collectionGroup": "fixes",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "error.type",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "timestamp",
+                    "order": "DESCENDING"
+                }
+            ]
+        }
+    ],
+    "fieldOverrides": []
+}
