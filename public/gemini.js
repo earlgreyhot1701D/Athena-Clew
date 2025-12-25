@@ -13,24 +13,14 @@ const Gemini = {
      */
     init() {
         try {
-            if (!window.getGenerativeModel) {
-                throw new Error('Vertex AI SDK not loaded (window.getGenerativeModel missing)');
+            if (window.GeminiModel) {
+                this.model = window.GeminiModel;
+                console.log('✅ Gemini 1.5 Pro connected (via Window)');
+            } else {
+                throw new Error('Vertex AI SDK not fully loaded');
             }
-
-            // Use the default firebase app (Compat) passed to Modular SDK
-            // This requires the compat app instance, which firebase.app() returns
-            this.model = window.getGenerativeModel(firebase.app(), {
-                model: 'gemini-1.5-pro',
-                generationConfig: {
-                    temperature: 0.3,
-                    topP: 0.8,
-                    topK: 40,
-                    maxOutputTokens: 2048
-                }
-            });
-            console.log('✅ Gemini 1.5 Pro initialized');
         } catch (error) {
-            console.error('Failed to initialize Gemini:', error);
+            console.error('Failed to connect Gemini:', error);
             throw error;
         }
     },

@@ -13,6 +13,9 @@ const firebaseConfig = {
     measurementId: "G-YBVJ39KPY4"
 };
 
+// Expose for Modular SDK usage
+window.REPO_CONFIG = firebaseConfig;
+
 // Initialize Firebase
 // Note: We expect 'firebase' to be available from the CDN imports in index.html
 firebase.initializeApp(firebaseConfig);

@@ -14,9 +14,40 @@
     <script type="module">
         console.log('🔄 Loading Vertex AI SDK...');
         try {
-            const { getGenerativeModel } = await import('https://www.gstatic.com/firebasejs/10.14.1/firebase-vertexai.js');
-            window.getGenerativeModel = getGenerativeModel;
-            console.log('✅ Vertex AI SDK Loaded successfully');
+            const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js');
+            const { getGenerativeModel } = await import('https://www.gstatic.com/firebasejs/10.14.1/firebase-vertexai-preview.js');
+
+            // Wait for REPO_CONFIG to be available (from firebase-config.js)
+            // It should be immediate since that script is blocking, but good to be safe?
+            // Actually, firebase-config.js is sync script above? No, it's below in original file?
+            // Let's check order. If firebase-config is below, we must wait or move this script below it.
+            // HTML order: libraries, THIS SCRIPT, then firebase-config.js. verified in previous VIEW.
+            // REPO_CONFIG won't be ready if this runs first!
+            // I must move the usage inside a DOMContentLoaded or wait.
+            // Or simpler: config is hardcoded or I move this script to end of body.
+
+            // Wait loop for config
+            let attempts = 0;
+            while (!window.REPO_CONFIG && attempts < 20) {
+                await new Promise(r => setTimeout(r, 50));
+                attempts++;
+            }
+
+            if (!window.REPO_CONFIG) throw new Error("Config missing");
+
+            const app = initializeApp(window.REPO_CONFIG);
+            const model = getGenerativeModel(app, {
+                model: 'gemini-1.5-pro',
+                generationConfig: {
+                    temperature: 0.3,
+                    topP: 0.8,
+                    topK: 40,
+                    maxOutputTokens: 2048
+                }
+            });
+
+            window.GeminiModel = model;
+            console.log('✅ Vertex AI SDK & Model Initialized');
         } catch (error) {
             console.error('❌ Failed to load Vertex AI SDK:', error);
         }
