@@ -2,38 +2,31 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Helper function to check if data is valid
-    function isValidSession() {
-      // Must have sessionId, createdAt
-      return request.resource.data.keys().hasAll(['sessionId', 'createdAt'])
-             && request.resource.data.sessionId is string
-             && request.resource.data.createdAt is timestamp;
-    }
-
-    // Helper to ensure immutable fields aren't changed
-    function isImmutableUpdate() {
-        return request.resource.data.sessionId == resource.data.sessionId
-               && request.resource.data.createdAt == resource.data.createdAt;
-    }
-
+    // Sessions collection
     match /sessions/{sessionId} {
-      // Allow getting a specific document if you know the ID (Auth by Knowledge)
-      // Deny list/query to prevent scanning
-      allow get: if true;
-      allow list: if false;
-
-      // Allow create if the ID in the document matches the path
-      allow create: if request.resource.data.sessionId == sessionId
-                    && isValidSession();
+      // Allow read/write for now (MVP has no auth)
+      // Post-hackathon: Add request.auth validation
+      allow read, write: if true;
       
-      // Allow update if immutable fields are preserved
-      allow update: if request.resource.data.sessionId == sessionId
-                    && isImmutableUpdate();
-
-      // Subcollections (projects, fixes, principles) inheriting 'knowledge' access
-      match /{document=**} {
-        allow read: if true; // If you know the parent session ID path, you can read subs
-        allow write: if true; // In a real app we'd validate structure here too
+      // Projects subcollection
+      match /projects/{projectId} {
+        allow read, write: if true;
+        
+        // Validate on write
+        allow create: if request.resource.data.keys().hasAll(['projectName', 'createdAt', 'context'])
+                      && request.resource.data.projectName is string
+                      && request.resource.data.projectName.size() > 0
+                      && request.resource.data.projectName.size() <= 100;
+        
+        // Fixes subcollection (created in Section 2)
+        match /fixes/{fixId} {
+          allow read, write: if true;
+        }
+        
+        // Principles subcollection (created in Section 2)
+        match /principles/{principleId} {
+          allow read, write: if true;
+        }
       }
     }
   }

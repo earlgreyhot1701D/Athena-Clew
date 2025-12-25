@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Athena Clew: The unified platform. Theseus Clew uses Gemini 3 Deep Thinking for intelligent debugging.">
+    <!-- Firebase SDK v10 (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    <!-- Firebase Config -->
+    <script src="firebase-config.js"></script>
     <title>Athena Clew Platform - Developer Ecosystem</title>
     
     <!-- Fonts -->
@@ -64,6 +69,28 @@
                 <span class="text-3xl font-headline font-black text-amber tracking-tight uppercase">Athena Clew</span>
                 <span class="text-xs font-headline text-navy/50 uppercase tracking-widest">Platform</span>
             </div>
+            
+            <!-- Project Selector -->
+            <div class="flex items-center gap-2">
+                <label for="project-select" class="text-xs text-navy/60 font-headline uppercase tracking-wider">
+                    Project:
+                </label>
+                <select 
+                    id="project-select" 
+                    class="bg-cream border-2 border-navy/20 px-3 py-1.5 font-headline text-sm focus:border-amber focus:outline-none rounded"
+                    onchange="window.ProjectUI && window.ProjectUI.handleSwitch(this.value)"
+                >
+                    <option value="">Loading...</option>
+                </select>
+                <button 
+                    id="new-project-btn"
+                    class="bg-amber text-navy font-headline font-bold px-3 py-1.5 text-xs uppercase border-2 border-amber hover:bg-amber/90 transition rounded"
+                    onclick="window.ProjectUI && window.ProjectUI.showNewProjectModal()"
+                >
+                    + New
+                </button>
+            </div>
+
             <div class="text-xs text-navy/60 font-headline tracking-wider hidden sm:block">
                 Local Browser Session • Persistent Cloud Backup Coming Soon
             </div>
@@ -259,6 +286,121 @@
     <!-- Scripts -->
     <script src="session.js"></script>
     <script src="ui.js"></script>
+    <script src="projects.js"></script>
+
+    <!-- Project Creation Modal -->
+    <div id="project-modal" class="hidden fixed inset-0 bg-navy/50 flex items-center justify-center z-50">
+      <div class="bg-white border-4 border-navy p-8 max-w-md w-full mx-4 shadow-craft-lg rounded">
+        <h3 class="font-headline font-bold text-navy text-xl mb-4 uppercase">Create New Project</h3>
+        <form id="project-form" onsubmit="event.preventDefault(); window.ProjectUI && window.ProjectUI.submitNewProject();">
+          <label class="block mb-4">
+            <span class="text-sm font-headline text-navy uppercase mb-1 block">Project Name *</span>
+            <input 
+              type="text" 
+              id="project-name-input"
+              placeholder="My React App"
+              maxlength="100"
+              class="w-full bg-cream border-2 border-navy/20 p-3 focus:border-amber focus:outline-none rounded"
+              required
+            >
+          </label>
+          <label class="block mb-6">
+            <span class="text-sm font-headline text-navy uppercase mb-1 block">Tech Stack (comma-separated)</span>
+            <input 
+              type="text" 
+              id="project-tech-input"
+              placeholder="React, TypeScript, Tailwind"
+              class="w-full bg-cream border-2 border-navy/20 p-3 focus:border-amber focus:outline-none rounded"
+            >
+            <span class="text-xs text-navy/50 mt-1 block">Optional - helps organize your projects</span>
+          </label>
+          <div class="flex gap-2">
+            <button 
+              type="submit" 
+              class="flex-1 bg-amber text-navy font-headline font-bold py-3 uppercase hover:bg-amber/90 transition rounded border-2 border-amber"
+            >
+              Create Project
+            </button>
+            <button 
+              type="button" 
+              onclick="window.ProjectUI && window.ProjectUI.closeModal()" 
+              class="flex-1 bg-transparent border-2 border-navy text-navy font-headline font-bold py-3 uppercase hover:bg-navy/5 transition rounded"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+    // Simple UI helpers for project management
+    window.ProjectUI = {
+      async init(sessionId) {
+        // Initialize projects and populate dropdown
+        try {
+          await window.Projects.initialize(sessionId);
+          await this.refreshProjectList(sessionId);
+        } catch (error) {
+          console.error('Project UI init failed:', error);
+        }
+      },
+
+      async refreshProjectList(sessionId) {
+        const select = document.getElementById('project-select');
+        const projects = await window.Projects.list(sessionId);
+        const currentId = window.Projects.getCurrent();
+
+        select.innerHTML = projects.map(p => 
+          `<option value="${p.id}" ${p.id === currentId ? 'selected' : ''}>
+            ${p.name}
+          </option>`
+        ).join('');
+      },
+
+      async handleSwitch(projectId) {
+        const sessionId = localStorage.getItem('athena_session_id');
+        await window.Projects.setCurrent(sessionId, projectId);
+        window.ui && window.ui.showSuccess(`Switched to ${projectId}`);
+        // Clear results when switching projects
+        const results = document.getElementById('results');
+        if (results) results.innerHTML = '';
+      },
+
+      showNewProjectModal() {
+        document.getElementById('project-modal').classList.remove('hidden');
+        document.getElementById('project-name-input').focus();
+      },
+
+      closeModal() {
+        document.getElementById('project-modal').classList.add('hidden');
+        document.getElementById('project-form').reset();
+      },
+
+      async submitNewProject() {
+        const sessionId = localStorage.getItem('athena_session_id');
+        const name = document.getElementById('project-name-input').value.trim();
+        const techInput = document.getElementById('project-tech-input').value.trim();
+        const techStack = techInput ? techInput.split(',').map(t => t.trim()) : [];
+
+        try {
+          const projectId = await window.Projects.create(sessionId, name, { techStack });
+          await window.Projects.setCurrent(sessionId, projectId);
+          await this.refreshProjectList(sessionId);
+          this.closeModal();
+          window.ui && window.ui.showSuccess(`Created "${name}"!`);
+        } catch (error) {
+          window.ui && window.ui.showError(error.message);
+        }
+      }
+    };
+
+    // Initialize when session is ready
+    document.addEventListener('DOMContentLoaded', async () => {
+      const sessionId = await getOrCreateSession(); // From session.js
+      await window.ProjectUI.init(sessionId);
+    });
+    </script>
     <!-- Pending: gemini.js, firestore.js, app.js -->
 
 </body>
