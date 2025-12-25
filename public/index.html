@@ -1,19 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Athena Clew: The unified platform. Theseus Clew uses Gemini 3 Deep Thinking for intelligent debugging.">
+    <meta name="description"
+        content="Athena Clew: The unified platform. Theseus Clew uses Gemini 3 Deep Thinking for intelligent debugging.">
     <!-- Firebase SDK v10 (Compat) -->
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+
+    <!-- Firebase Vertex AI (Modular) - Exposed Globally for Hybrid usage -->
+    <script type="module">
+        import { getGenerativeModel } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-vertexai.js';
+        window.getGenerativeModel = getGenerativeModel;
+    </script>
+
     <!-- Firebase Config -->
     <script src="firebase-config.js"></script>
     <title>Athena Clew Platform - Developer Ecosystem</title>
-    
+
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700;800;900&family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700;800;900&family=Source+Sans+Pro:wght@400;600&display=swap"
+        rel="stylesheet">
+
     <!-- Custom Styles -->
     <link rel="stylesheet" href="styles.css">
 
@@ -56,37 +67,36 @@
         }
     </script>
 </head>
+
 <body class="p-4 md:p-8">
 
     <div class="wireframe-container">
-        
+
         <!-- HEADER -->
-        <header class="sticky top-0 z-50 bg-cream border-b-4 border-navy px-6 py-4 flex justify-between items-center shadow-craft">
+        <header
+            class="sticky top-0 z-50 bg-cream border-b-4 border-navy px-6 py-4 flex justify-between items-center shadow-craft">
             <div class="flex items-center gap-4">
-                <div class="w-10 h-10 border-3 border-amber bg-navy flex items-center justify-center" aria-hidden="true">
+                <div class="w-10 h-10 border-3 border-amber bg-navy flex items-center justify-center"
+                    aria-hidden="true">
                     <div class="w-2 h-5 bg-amber"></div>
                 </div>
                 <span class="text-3xl font-headline font-black text-amber tracking-tight uppercase">Athena Clew</span>
                 <span class="text-xs font-headline text-navy/50 uppercase tracking-widest">Platform</span>
             </div>
-            
+
             <!-- Project Selector -->
             <div class="flex items-center gap-2">
                 <label for="project-select" class="text-xs text-navy/60 font-headline uppercase tracking-wider">
                     Project:
                 </label>
-                <select 
-                    id="project-select" 
+                <select id="project-select"
                     class="bg-cream border-2 border-navy/20 px-3 py-1.5 font-headline text-sm focus:border-amber focus:outline-none rounded"
-                    onchange="window.ProjectUI && window.ProjectUI.handleSwitch(this.value)"
-                >
+                    onchange="window.ProjectUI && window.ProjectUI.handleSwitch(this.value)">
                     <option value="">Loading...</option>
                 </select>
-                <button 
-                    id="new-project-btn"
+                <button id="new-project-btn"
                     class="bg-amber text-navy font-headline font-bold px-3 py-1.5 text-xs uppercase border-2 border-amber hover:bg-amber/90 transition rounded"
-                    onclick="window.ProjectUI && window.ProjectUI.showNewProjectModal()"
-                >
+                    onclick="window.ProjectUI && window.ProjectUI.showNewProjectModal()">
                     + New
                 </button>
             </div>
@@ -98,7 +108,7 @@
 
         <!-- MAIN CONTENT -->
         <main class="p-8 md:p-12">
-            
+
             <!-- WELCOME SECTION -->
             <section class="mb-12 text-center max-w-3xl mx-auto">
                 <h1 class="text-5xl md:text-6xl font-black text-navy mb-4 tracking-tight">
@@ -117,30 +127,32 @@
                             🚀 Theseus Clew
                         </h2>
                         <!-- Using inline utility classes composed from the @apply mockup -->
-                        <span class="inline-block px-3 py-1 font-headline font-bold text-xs uppercase tracking-wider rounded border-2 bg-amber-200 text-amber-900 border-amber-400 animate-pulse">New</span>
+                        <span
+                            class="inline-block px-3 py-1 font-headline font-bold text-xs uppercase tracking-wider rounded border-2 bg-amber-200 text-amber-900 border-amber-400 animate-pulse">New</span>
                     </div>
-                    <p class="text-sm text-navy/60 font-headline tracking-wider">Autonomous Debugging Agent (Gemini 3 Deep Thinking)</p>
+                    <p class="text-sm text-navy/60 font-headline tracking-wider">Autonomous Debugging Agent (Gemini 3
+                        Deep Thinking)</p>
                 </div>
 
                 <p class="text-navy/70 mb-8 leading-relaxed">
-                    Hit an error. Theseus uses Gemini 3's Deep Thinking to reason about what went wrong, search your past fixes, extract underlying principles, and intelligently apply solutions from your entire project ecosystem.
+                    Hit an error. Theseus uses Gemini 3's Deep Thinking to reason about what went wrong, search your
+                    past fixes, extract underlying principles, and intelligently apply solutions from your entire
+                    project ecosystem.
                 </p>
 
                 <!-- THESEUS DEMO -->
                 <form id="theseus-demo" onsubmit="event.preventDefault(); window.app && window.app.handleSubmit();">
                     <div class="bg-white border-3 border-navy p-6 rounded mb-8">
                         <h3 class="font-headline font-bold text-navy mb-4 uppercase text-sm">Try It Now</h3>
-                        <textarea 
-                            id="error-input"
-                            placeholder="Paste an error from your terminal..."
-                            class="w-full bg-cream border-3 border-navy/20 p-4 font-mono text-sm focus:border-amber focus:outline-none resize-none h-24 text-navy mb-4"
-                        ></textarea>
-                        <button id="get-help-btn" class="bg-amber text-navy font-headline font-bold px-6 py-3 hover:bg-amber/90 transition shadow-craft border-3 border-amber uppercase tracking-wider text-sm">
+                        <textarea id="error-input" placeholder="Paste an error from your terminal..."
+                            class="w-full bg-cream border-3 border-navy/20 p-4 font-mono text-sm focus:border-amber focus:outline-none resize-none h-24 text-navy mb-4"></textarea>
+                        <button id="get-help-btn"
+                            class="bg-amber text-navy font-headline font-bold px-6 py-3 hover:bg-amber/90 transition shadow-craft border-3 border-amber uppercase tracking-wider text-sm">
                             🚀 Get Help
                         </button>
                     </div>
                 </form>
-                
+
                 <!-- RESULTS AREA -->
                 <div id="results"></div>
 
@@ -148,19 +160,23 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div class="bg-navy/5 border-2 border-navy/10 p-5 rounded">
                         <p class="font-headline font-bold text-navy text-base mb-2">🧠 Deep Reasoning</p>
-                        <p class="text-base text-navy/70 leading-relaxed">Gemini 3 thinks deeply about errors, not just pattern matching</p>
+                        <p class="text-base text-navy/70 leading-relaxed">Gemini 3 thinks deeply about errors, not just
+                            pattern matching</p>
                     </div>
                     <div class="bg-navy/5 border-2 border-navy/10 p-5 rounded">
                         <p class="font-headline font-bold text-navy text-base mb-2">⚙️ Multi-Step</p>
-                        <p class="text-base text-navy/70 leading-relaxed">Analyze → search → extract → match → suggest</p>
+                        <p class="text-base text-navy/70 leading-relaxed">Analyze → search → extract → match → suggest
+                        </p>
                     </div>
                     <div class="bg-navy/5 border-2 border-navy/10 p-5 rounded">
                         <p class="font-headline font-bold text-navy text-base mb-2">📚 Learns Principles</p>
-                        <p class="text-base text-navy/70 leading-relaxed">Extracts what you learned, applies across projects</p>
+                        <p class="text-base text-navy/70 leading-relaxed">Extracts what you learned, applies across
+                            projects</p>
                     </div>
                     <div class="bg-navy/5 border-2 border-navy/10 p-5 rounded">
                         <p class="font-headline font-bold text-navy text-base mb-2">🔄 Autonomous</p>
-                        <p class="text-base text-navy/70 leading-relaxed">Learns from feedback without asking for each step</p>
+                        <p class="text-base text-navy/70 leading-relaxed">Learns from feedback without asking for each
+                            step</p>
                     </div>
                 </div>
             </section>
@@ -173,18 +189,21 @@
                 <p class="text-navy/70 mb-8 text-base">
                     Theseus works standalone OR as part of your unified developer ecosystem.
                 </p>
-                
+
                 <!-- TOOLS GRID -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    
+
                     <!-- LUMEN CLEW -->
-                    <a href="https://lumen-clew.lovable.app" target="_blank" class="bg-white border-3 border-navy/10 p-7 shadow-craft hover:shadow-craft-lg transition border-amber/30 group cursor-pointer hover:border-amber">
+                    <a href="https://lumen-clew.lovable.app" target="_blank"
+                        class="bg-white border-3 border-navy/10 p-7 shadow-craft hover:shadow-craft-lg transition border-amber/30 group cursor-pointer hover:border-amber">
                         <div class="flex items-center gap-2 mb-4">
                             <h3 class="font-headline font-bold text-navy text-base">Lumen Clew</h3>
-                            <span class="inline-block px-3 py-1 font-headline font-bold text-xs uppercase tracking-wider rounded border-2 bg-green-100 text-green-800 border-green-300">[Live]</span>
+                            <span
+                                class="inline-block px-3 py-1 font-headline font-bold text-xs uppercase tracking-wider rounded border-2 bg-green-100 text-green-800 border-green-300">[Live]</span>
                         </div>
                         <p class="text-base text-navy/70 mb-4 leading-relaxed">
-                            Run industry-standard tools on your code and get plain-language insights about what's working and what needs attention.
+                            Run industry-standard tools on your code and get plain-language insights about what's
+                            working and what needs attention.
                         </p>
                         <div class="text-amber font-headline font-bold text-sm group-hover:translate-x-1 transition">
                             Open →
@@ -192,13 +211,16 @@
                     </a>
 
                     <!-- METIS CLEW -->
-                    <a href="https://metis-clew.vercel.app" target="_blank" class="bg-white border-3 border-navy/10 p-7 shadow-craft hover:shadow-craft-lg transition border-amber/30 group cursor-pointer hover:border-amber">
+                    <a href="https://metis-clew.vercel.app" target="_blank"
+                        class="bg-white border-3 border-navy/10 p-7 shadow-craft hover:shadow-craft-lg transition border-amber/30 group cursor-pointer hover:border-amber">
                         <div class="flex items-center gap-2 mb-4">
                             <h3 class="font-headline font-bold text-navy text-base">Metis Clew</h3>
-                            <span class="inline-block px-3 py-1 font-headline font-bold text-xs uppercase tracking-wider rounded border-2 bg-green-100 text-green-800 border-green-300">[Live]</span>
+                            <span
+                                class="inline-block px-3 py-1 font-headline font-bold text-xs uppercase tracking-wider rounded border-2 bg-green-100 text-green-800 border-green-300">[Live]</span>
                         </div>
                         <p class="text-base text-navy/70 mb-4 leading-relaxed">
-                            Paste AI-generated code and get clear explanations of WHAT it does, HOW it works, and WHY it was designed that way.
+                            Paste AI-generated code and get clear explanations of WHAT it does, HOW it works, and WHY it
+                            was designed that way.
                         </p>
                         <div class="text-amber font-headline font-bold text-sm group-hover:translate-x-1 transition">
                             Open →
@@ -206,24 +228,32 @@
                     </a>
 
                     <!-- JANUS CLEW (Coming Soon) -->
-                    <div class="bg-white border-3 border-navy/10 p-7 shadow-craft hover:shadow-craft-lg transition opacity-60 grayscale-[30%]">
+                    <div
+                        class="bg-white border-3 border-navy/10 p-7 shadow-craft hover:shadow-craft-lg transition opacity-60 grayscale-[30%]">
                         <div class="flex items-center gap-2 mb-4">
                             <h3 class="font-headline font-bold text-navy text-base">Janus Clew</h3>
-                            <span class="inline-block px-3 py-1 font-headline font-bold text-xs uppercase tracking-wider rounded border-2 bg-amber-100 text-amber-800 border-amber-300">[Coming Soon]</span>
+                            <span
+                                class="inline-block px-3 py-1 font-headline font-bold text-xs uppercase tracking-wider rounded border-2 bg-amber-100 text-amber-800 border-amber-300">[Coming
+                                Soon]</span>
                         </div>
                         <p class="text-base text-navy/70 mb-4 leading-relaxed">
-                            Analyze your repositories to measure complexity progression, detect actual skills from your code, and get forward-looking career guidance.
+                            Analyze your repositories to measure complexity progression, detect actual skills from your
+                            code, and get forward-looking career guidance.
                         </p>
                     </div>
 
                     <!-- ARIADNE CLEW (Coming Soon) -->
-                    <div class="bg-white border-3 border-navy/10 p-7 shadow-craft hover:shadow-craft-lg transition opacity-60 grayscale-[30%]">
+                    <div
+                        class="bg-white border-3 border-navy/10 p-7 shadow-craft hover:shadow-craft-lg transition opacity-60 grayscale-[30%]">
                         <div class="flex items-center gap-2 mb-4">
                             <h3 class="font-headline font-bold text-navy text-base">Ariadne Clew</h3>
-                            <span class="inline-block px-3 py-1 font-headline font-bold text-xs uppercase tracking-wider rounded border-2 bg-amber-100 text-amber-800 border-amber-300">[Coming Soon]</span>
+                            <span
+                                class="inline-block px-3 py-1 font-headline font-bold text-xs uppercase tracking-wider rounded border-2 bg-amber-100 text-amber-800 border-amber-300">[Coming
+                                Soon]</span>
                         </div>
                         <p class="text-base text-navy/70 mb-4 leading-relaxed">
-                            Transform chaotic chat transcripts into structured clarity by extracting aha moments, design decisions, scope changes, and reasoning.
+                            Transform chaotic chat transcripts into structured clarity by extracting aha moments, design
+                            decisions, scope changes, and reasoning.
                         </p>
                     </div>
                 </div>
@@ -234,16 +264,20 @@
                 <h2 class="text-2xl font-headline font-bold text-navy mb-8 uppercase text-center">
                     🗺️ Coming Soon to Athena
                 </h2>
-                
+
                 <div class="space-y-5 max-w-3xl mx-auto">
                     <!-- V1.5: Janus -->
                     <div class="border-l-4 border-l-amber pl-6 py-4 bg-amber/5 p-4 rounded">
                         <div class="flex items-center gap-2 mb-2">
                             <h3 class="font-headline font-bold text-navy text-sm uppercase">V1.5: Janus Clew</h3>
-                            <span class="text-xs bg-amber-100 text-amber-900 px-2 py-1 border border-amber-300 rounded font-bold">AWS Winner</span>
+                            <span
+                                class="text-xs bg-amber-100 text-amber-900 px-2 py-1 border border-amber-300 rounded font-bold">AWS
+                                Winner</span>
                         </div>
                         <p class="text-navy/70 text-base mb-3 leading-relaxed">
-                            Evidence-backed growth tracking. Janus analyzes your repositories to measure coding complexity across projects, shows measurable proof of growth, and provides forward-looking career guidance via AWS AgentCore. Already proven and awarded.
+                            Evidence-backed growth tracking. Janus analyzes your repositories to measure coding
+                            complexity across projects, shows measurable proof of growth, and provides forward-looking
+                            career guidance via AWS AgentCore. Already proven and awarded.
                         </p>
                         <p class="text-sm text-navy/60 italic border-t border-amber/30 pt-3 mt-3">
                             Won AWS Global Vibe: AI Coding Hackathon 2025 • Scholarship to Draper University Cohort 2026
@@ -254,15 +288,20 @@
                     <div class="border-l-4 border-l-navy pl-6 py-4 bg-navy/5 p-4 rounded">
                         <h3 class="font-headline font-bold text-navy text-sm uppercase">V2.0: Ariadne Clew</h3>
                         <p class="text-navy/70 text-base mt-3 leading-relaxed">
-                            Reasoning preservation for LLM-native builders. Ariadne transforms chaotic chat transcripts into structured clarity by extracting aha moments, MVP changes, scope creep, design decisions, and the reasoning that disappears in fast iteration. Autonomous AWS AgentCore reasoning agent, model-agnostic.
+                            Reasoning preservation for LLM-native builders. Ariadne transforms chaotic chat transcripts
+                            into structured clarity by extracting aha moments, MVP changes, scope creep, design
+                            decisions, and the reasoning that disappears in fast iteration. Autonomous AWS AgentCore
+                            reasoning agent, model-agnostic.
                         </p>
                     </div>
 
                     <!-- Future: Cloud Storage -->
                     <div class="border-l-4 border-l-sage pl-6 py-4 bg-sage/5 p-4 rounded">
-                        <h3 class="font-headline font-bold text-navy text-sm uppercase">Future: Persistent Cloud Backup</h3>
+                        <h3 class="font-headline font-bold text-navy text-sm uppercase">Future: Persistent Cloud Backup
+                        </h3>
                         <p class="text-navy/70 text-base mt-3 leading-relaxed">
-                            Local browser session powers MVP. Cloud backup coming soon—persist your debugging history, fixes, and principles across devices. Firebase-backed with your data staying yours.
+                            Local browser session powers MVP. Cloud backup coming soon—persist your debugging history,
+                            fixes, and principles across devices. Firebase-backed with your data staying yours.
                         </p>
                     </div>
                 </div>
@@ -278,9 +317,10 @@
                 <a href="#" class="hover:text-amber transition">Contact</a>
                 <a href="#" class="hover:text-amber transition">GitHub</a>
             </div>
-            <p class="italic text-xs">Built by vibecoders, for vibecoders. The Clew Suite: Wisdom from many sources, unified on one platform.</p>
+            <p class="italic text-xs">Built by vibecoders, for vibecoders. The Clew Suite: Wisdom from many sources,
+                unified on one platform.</p>
         </footer>
-        
+
     </div>
 
     <!-- Scripts -->
@@ -290,118 +330,107 @@
 
     <!-- Project Creation Modal -->
     <div id="project-modal" class="hidden fixed inset-0 bg-navy/50 flex items-center justify-center z-50">
-      <div class="bg-white border-4 border-navy p-8 max-w-md w-full mx-4 shadow-craft-lg rounded">
-        <h3 class="font-headline font-bold text-navy text-xl mb-4 uppercase">Create New Project</h3>
-        <form id="project-form" onsubmit="event.preventDefault(); window.ProjectUI && window.ProjectUI.submitNewProject();">
-          <label class="block mb-4">
-            <span class="text-sm font-headline text-navy uppercase mb-1 block">Project Name *</span>
-            <input 
-              type="text" 
-              id="project-name-input"
-              placeholder="My React App"
-              maxlength="100"
-              class="w-full bg-cream border-2 border-navy/20 p-3 focus:border-amber focus:outline-none rounded"
-              required
-            >
-          </label>
-          <label class="block mb-6">
-            <span class="text-sm font-headline text-navy uppercase mb-1 block">Tech Stack (comma-separated)</span>
-            <input 
-              type="text" 
-              id="project-tech-input"
-              placeholder="React, TypeScript, Tailwind"
-              class="w-full bg-cream border-2 border-navy/20 p-3 focus:border-amber focus:outline-none rounded"
-            >
-            <span class="text-xs text-navy/50 mt-1 block">Optional - helps organize your projects</span>
-          </label>
-          <div class="flex gap-2">
-            <button 
-              type="submit" 
-              class="flex-1 bg-amber text-navy font-headline font-bold py-3 uppercase hover:bg-amber/90 transition rounded border-2 border-amber"
-            >
-              Create Project
-            </button>
-            <button 
-              type="button" 
-              onclick="window.ProjectUI && window.ProjectUI.closeModal()" 
-              class="flex-1 bg-transparent border-2 border-navy text-navy font-headline font-bold py-3 uppercase hover:bg-navy/5 transition rounded"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
-      </div>
+        <div class="bg-white border-4 border-navy p-8 max-w-md w-full mx-4 shadow-craft-lg rounded">
+            <h3 class="font-headline font-bold text-navy text-xl mb-4 uppercase">Create New Project</h3>
+            <form id="project-form"
+                onsubmit="event.preventDefault(); window.ProjectUI && window.ProjectUI.submitNewProject();">
+                <label class="block mb-4">
+                    <span class="text-sm font-headline text-navy uppercase mb-1 block">Project Name *</span>
+                    <input type="text" id="project-name-input" placeholder="My React App" maxlength="100"
+                        class="w-full bg-cream border-2 border-navy/20 p-3 focus:border-amber focus:outline-none rounded"
+                        required>
+                </label>
+                <label class="block mb-6">
+                    <span class="text-sm font-headline text-navy uppercase mb-1 block">Tech Stack
+                        (comma-separated)</span>
+                    <input type="text" id="project-tech-input" placeholder="React, TypeScript, Tailwind"
+                        class="w-full bg-cream border-2 border-navy/20 p-3 focus:border-amber focus:outline-none rounded">
+                    <span class="text-xs text-navy/50 mt-1 block">Optional - helps organize your projects</span>
+                </label>
+                <div class="flex gap-2">
+                    <button type="submit"
+                        class="flex-1 bg-amber text-navy font-headline font-bold py-3 uppercase hover:bg-amber/90 transition rounded border-2 border-amber">
+                        Create Project
+                    </button>
+                    <button type="button" onclick="window.ProjectUI && window.ProjectUI.closeModal()"
+                        class="flex-1 bg-transparent border-2 border-navy text-navy font-headline font-bold py-3 uppercase hover:bg-navy/5 transition rounded">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <script>
-    // Simple UI helpers for project management
-    window.ProjectUI = {
-      async init(sessionId) {
-        // Initialize projects and populate dropdown
-        try {
-          await window.Projects.initialize(sessionId);
-          await this.refreshProjectList(sessionId);
-        } catch (error) {
-          console.error('Project UI init failed:', error);
-        }
-      },
+        // Simple UI helpers for project management
+        window.ProjectUI = {
+            async init(sessionId) {
+                // Initialize projects and populate dropdown
+                try {
+                    await window.Projects.initialize(sessionId);
+                    await this.refreshProjectList(sessionId);
+                } catch (error) {
+                    console.error('Project UI init failed:', error);
+                }
+            },
 
-      async refreshProjectList(sessionId) {
-        const select = document.getElementById('project-select');
-        const projects = await window.Projects.list(sessionId);
-        const currentId = window.Projects.getCurrent();
+            async refreshProjectList(sessionId) {
+                const select = document.getElementById('project-select');
+                const projects = await window.Projects.list(sessionId);
+                const currentId = window.Projects.getCurrent();
 
-        select.innerHTML = projects.map(p => 
-          `<option value="${p.id}" ${p.id === currentId ? 'selected' : ''}>
+                select.innerHTML = projects.map(p =>
+                    `<option value="${p.id}" ${p.id === currentId ? 'selected' : ''}>
             ${p.name}
           </option>`
-        ).join('');
-      },
+                ).join('');
+            },
 
-      async handleSwitch(projectId) {
-        const sessionId = localStorage.getItem('athena_session_id');
-        await window.Projects.setCurrent(sessionId, projectId);
-        window.ui && window.ui.showSuccess(`Switched to ${projectId}`);
-        // Clear results when switching projects
-        const results = document.getElementById('results');
-        if (results) results.innerHTML = '';
-      },
+            async handleSwitch(projectId) {
+                const sessionId = localStorage.getItem('athena_session_id');
+                await window.Projects.setCurrent(sessionId, projectId);
+                window.ui && window.ui.showSuccess(`Switched to ${projectId}`);
+                // Clear results when switching projects
+                const results = document.getElementById('results');
+                if (results) results.innerHTML = '';
+            },
 
-      showNewProjectModal() {
-        document.getElementById('project-modal').classList.remove('hidden');
-        document.getElementById('project-name-input').focus();
-      },
+            showNewProjectModal() {
+                document.getElementById('project-modal').classList.remove('hidden');
+                document.getElementById('project-name-input').focus();
+            },
 
-      closeModal() {
-        document.getElementById('project-modal').classList.add('hidden');
-        document.getElementById('project-form').reset();
-      },
+            closeModal() {
+                document.getElementById('project-modal').classList.add('hidden');
+                document.getElementById('project-form').reset();
+            },
 
-      async submitNewProject() {
-        const sessionId = localStorage.getItem('athena_session_id');
-        const name = document.getElementById('project-name-input').value.trim();
-        const techInput = document.getElementById('project-tech-input').value.trim();
-        const techStack = techInput ? techInput.split(',').map(t => t.trim()) : [];
+            async submitNewProject() {
+                const sessionId = localStorage.getItem('athena_session_id');
+                const name = document.getElementById('project-name-input').value.trim();
+                const techInput = document.getElementById('project-tech-input').value.trim();
+                const techStack = techInput ? techInput.split(',').map(t => t.trim()) : [];
 
-        try {
-          const projectId = await window.Projects.create(sessionId, name, { techStack });
-          await window.Projects.setCurrent(sessionId, projectId);
-          await this.refreshProjectList(sessionId);
-          this.closeModal();
-          window.ui && window.ui.showSuccess(`Created "${name}"!`);
-        } catch (error) {
-          window.ui && window.ui.showError(error.message);
-        }
-      }
-    };
+                try {
+                    const projectId = await window.Projects.create(sessionId, name, { techStack });
+                    await window.Projects.setCurrent(sessionId, projectId);
+                    await this.refreshProjectList(sessionId);
+                    this.closeModal();
+                    window.ui && window.ui.showSuccess(`Created "${name}"!`);
+                } catch (error) {
+                    window.ui && window.ui.showError(error.message);
+                }
+            }
+        };
 
-    // Initialize when session is ready
-    document.addEventListener('DOMContentLoaded', async () => {
-      const sessionId = await getOrCreateSession(); // From session.js
-      await window.ProjectUI.init(sessionId);
-    });
+        // Initialize when session is ready
+        document.addEventListener('DOMContentLoaded', async () => {
+            const sessionId = await getOrCreateSession(); // From session.js
+            await window.ProjectUI.init(sessionId);
+        });
     </script>
     <!-- Pending: gemini.js, firestore.js, app.js -->
 
 </body>
+
 </html>
