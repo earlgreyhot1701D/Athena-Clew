@@ -31,6 +31,25 @@ db.enablePersistence()
         }
     });
 
+// Force network online after persistence attempt
+// (Prevents getting stuck in offline mode)
+setTimeout(() => {
+    db.enableNetwork()
+        .then(() => console.log('🌐 Firestore network force-enabled'))
+        .catch(err => {
+            console.warn('⚠️ Network enable failed:', err);
+            // Fallback: create new instance
+            window.db = firebase.firestore();
+            console.log('🔄 Created fresh Firestore instance');
+        });
+}, 1000);
+
+// Add connection state listener for debugging
+db.collection('_health_check').doc('ping').onSnapshot(
+    () => console.log('✅ Firestore connection active'),
+    (err) => console.error('❌ Firestore connection error:', err)
+);
+
 // Export globally
 window.db = db;
 window.firebase = firebase;
