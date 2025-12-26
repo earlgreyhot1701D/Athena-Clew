@@ -7,36 +7,40 @@
     <meta name="description"
         content="Athena Clew: The unified platform. Theseus Clew uses Gemini 3 Deep Thinking for intelligent debugging.">
     <!-- Firebase SDK v10 (Compat) -->
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore-compat.js"></script>
 
-    <!-- Firebase Vertex AI (Modular) - Exposed Globally for Hybrid usage -->
+    <!-- Firebase Config (MUST BE BEFORE VERTEX AI) -->
+    <script src="firebase-config.js"></script>
+
+    <!-- Firebase AI Logic (Modular SDK) -->
     <script type="module">
-        console.log('🔄 Loading Vertex AI SDK...');
+        console.log('🔄 Loading Firebase AI Logic SDK...');
+
         try {
-            const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js');
-            const { getGenerativeModel } = await import('https://www.gstatic.com/firebasejs/10.14.1/firebase-vertexai-preview.js');
+            // Import from firebase/ai (NOT firebase/vertexai-preview)
+            const { initializeApp } = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js');
+            const { getAI, getGenerativeModel, VertexAIBackend } = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-ai.js');
 
-            // Wait for REPO_CONFIG to be available (from firebase-config.js)
-            // It should be immediate since that script is blocking, but good to be safe?
-            // Actually, firebase-config.js is sync script above? No, it's below in original file?
-            // Let's check order. If firebase-config is below, we must wait or move this script below it.
-            // HTML order: libraries, THIS SCRIPT, then firebase-config.js. verified in previous VIEW.
-            // REPO_CONFIG won't be ready if this runs first!
-            // I must move the usage inside a DOMContentLoaded or wait.
-            // Or simpler: config is hardcoded or I move this script to end of body.
-
-            // Wait loop for config
-            let attempts = 0;
-            while (!window.REPO_CONFIG && attempts < 20) {
-                await new Promise(r => setTimeout(r, 50));
-                attempts++;
+            // Validate config
+            if (!window.REPO_CONFIG) {
+                throw new Error("Config missing - check firebase-config.js loads first");
             }
 
-            if (!window.REPO_CONFIG) throw new Error("Config missing");
+            console.log('✅ Config available');
 
+            // Initialize Firebase app
             const app = initializeApp(window.REPO_CONFIG);
-            const model = getGenerativeModel(app, {
+            console.log('✅ Firebase app initialized');
+
+            // Initialize AI with Vertex AI backend
+            const ai = getAI(app, {
+                backend: new VertexAIBackend()
+            });
+            console.log('✅ AI backend initialized');
+
+            // Create Gemini model
+            const model = getGenerativeModel(ai, {
                 model: 'gemini-1.5-pro',
                 generationConfig: {
                     temperature: 0.3,
@@ -47,14 +51,13 @@
             });
 
             window.GeminiModel = model;
-            console.log('✅ Vertex AI SDK & Model Initialized');
+            console.log('✅ Firebase AI Logic SDK & Model Initialized');
+
         } catch (error) {
-            console.error('❌ Failed to load Vertex AI SDK:', error);
+            console.error('❌ Failed to load Firebase AI Logic SDK:', error);
+            console.error('Error details:', error.message);
         }
     </script>
-
-    <!-- Firebase Config -->
-    <script src="firebase-config.js"></script>
     <title>Athena Clew Platform - Developer Ecosystem</title>
 
     <!-- Fonts -->
