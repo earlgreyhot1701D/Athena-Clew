@@ -106,7 +106,7 @@ const FirestoreOps = {
                 error: {
                     message: errorData.message,
                     stack: errorData.stack || '',
-                    type: analysis.classification
+                    type: errorData.type
                 },
                 fix: {
                     solution: fixData.solution,
