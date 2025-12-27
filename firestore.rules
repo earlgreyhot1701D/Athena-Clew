@@ -1,32 +1,10 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // Sessions collection
     match /sessions/{sessionId} {
-      // Allow read/write for now (MVP has no auth)
-      // Post-hackathon: Add request.auth validation
       allow read, write: if true;
-      
-      // Projects subcollection
-      match /projects/{projectId} {
+      match /{document=**} {
         allow read, write: if true;
-        
-        // Validate on write
-        allow create: if request.resource.data.keys().hasAll(['projectName', 'createdAt', 'context'])
-                      && request.resource.data.projectName is string
-                      && request.resource.data.projectName.size() > 0
-                      && request.resource.data.projectName.size() <= 100;
-        
-        // Fixes subcollection (created in Section 2)
-        match /fixes/{fixId} {
-          allow read, write: if true;
-        }
-        
-        // Principles subcollection (created in Section 2)
-        match /principles/{principleId} {
-          allow read, write: if true;
-        }
       }
     }
   }

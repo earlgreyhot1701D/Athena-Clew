@@ -22,27 +22,14 @@ firebase.initializeApp(firebaseConfig);
 
 // Initialize Firestore with offline persistence
 const db = firebase.firestore();
-db.enablePersistence()
-    .catch((err) => {
-        if (err.code == 'failed-precondition') {
-            console.warn('Persistence failed: Multiple tabs open');
-        } else if (err.code == 'unimplemented') {
-            console.warn('Persistence not supported');
-        }
-    });
+// ⚠️ PERSISTENCE DISABLED TO FIX HANGING WRITES
+// db.enablePersistence()... 
+// We are forcing a clean, online-only state to resolve the timeouts.
 
-// Force network online after persistence attempt
-// (Prevents getting stuck in offline mode)
-setTimeout(() => {
-    db.enableNetwork()
-        .then(() => console.log('🌐 Firestore network force-enabled'))
-        .catch(err => {
-            console.warn('⚠️ Network enable failed:', err);
-            // Fallback: create new instance
-            window.db = firebase.firestore();
-            console.log('🔄 Created fresh Firestore instance');
-        });
-}, 1000);
+// Force network online immediately
+db.enableNetwork()
+    .then(() => console.log('🌐 Firestore network enabled (Online-Only Mode)'))
+    .catch(err => console.error('❌ Network enable failed:', err));
 
 // Add connection state listener for debugging
 db.collection('_health_check').doc('ping').onSnapshot(
