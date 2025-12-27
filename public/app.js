@@ -43,10 +43,51 @@ const App = {
                 await window.ProjectUI.init(sessionId);
             }
 
+            // Initialize HistoryView
+            if (window.HistoryView) {
+                const currentProjectId = window.Projects.getCurrent();
+                window.HistoryView.init(sessionId, currentProjectId);
+            }
+
+            // Wire up tab buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const tabName = e.target.id.replace('tab-', '');
+                    this.handleTabSwitch(tabName);
+                });
+            });
+
             console.log('✅ App initialized');
         } catch (error) {
             console.error('App initialization failed:', error);
-            if (window.ui) window.ui.showError(`Failed to initialize app: ${error.message}`);
+            window.ui && window.ui.showError('Initialization failed: ' + error.message);
+        }
+    },
+
+    /**
+     * Handle tab switching (Debug | History | Analytics)
+     */
+    handleTabSwitch(tabName) {
+        // Update tab buttons
+        document.querySelectorAll('.tab-button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.getElementById(`tab-${tabName}`)?.classList.add('active');
+
+        // Show/hide sections
+        const sections = ['debug', 'history', 'analytics'];
+        sections.forEach(section => {
+            const el = document.getElementById(`${section}-section`);
+            if (el) {
+                el.classList.toggle('hidden', section !== tabName);
+            }
+        });
+
+        // Load data for active tab
+        if (tabName === 'history' && window.HistoryView) {
+            const sessionId = localStorage.getItem('athena_session_id');
+            const projectId = window.Projects.getCurrent();
+            window.HistoryView.render(sessionId, projectId);
         }
     },
 

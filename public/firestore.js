@@ -238,6 +238,32 @@ const FirestoreOps = {
         } catch (error) {
             console.error('Update success rate failed:', error);
         }
+    },
+
+    /**
+     * Get all fixes for a project (for History View)
+     */
+    async getAllFixesForProject(sessionId, projectId) {
+        try {
+            const query = db.collection('sessions')
+                .doc(sessionId)
+                .collection('projects')
+                .doc(projectId)
+                .collection('fixes')
+                .orderBy('timestamp', 'desc')
+                .limit(50);
+
+            const snapshot = await query.get();
+
+            return snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+
+        } catch (error) {
+            console.error('Failed to get all fixes:', error);
+            return [];
+        }
     }
 };
 

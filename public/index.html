@@ -155,6 +155,19 @@
             </div>
         </header>
 
+        <!-- TAB NAVIGATION -->
+        <nav class="flex gap-4 border-b-3 border-navy/10 mb-8 px-8 pt-8">
+            <button id="tab-debug" class="tab-button active px-6 py-3 font-headline font-bold uppercase text-sm">
+                🐛 Debug Error
+            </button>
+            <button id="tab-history" class="tab-button px-6 py-3 font-headline font-bold uppercase text-sm">
+                📜 History
+            </button>
+            <button id="tab-analytics" class="tab-button px-6 py-3 font-headline font-bold uppercase text-sm">
+                📊 Analytics
+            </button>
+        </nav>
+
         <!-- MAIN CONTENT -->
         <main class="p-8 md:p-12">
 
@@ -169,7 +182,7 @@
             </section>
 
             <!-- THESEUS CLEW - FEATURED (NEW) -->
-            <section class="mb-12 p-8 border-4 border-amber bg-amber/5 shadow-craft-lg">
+            <section id="debug-section" class="mb-12 p-8 border-4 border-amber bg-amber/5 shadow-craft-lg">
                 <div class="mb-6">
                     <div class="flex items-center gap-3 mb-2">
                         <h2 class="text-3xl font-headline font-bold text-navy uppercase">
@@ -230,6 +243,35 @@
                         <p class="text-base text-navy/70 leading-relaxed">Learns from feedback without asking for each
                             step</p>
                     </div>
+                </div>
+            </section>
+
+            <!-- HISTORY SECTION (Hidden by default) -->
+            <section id="history-section" class="mb-12 hidden">
+                <h2 class="text-2xl font-headline font-bold text-navy uppercase mb-6">
+                    Debugging History
+                </h2>
+
+                <!-- History List -->
+                <div id="history-list" class="space-y-4">
+                    <!-- Populated by history.js -->
+                </div>
+
+                <!-- Empty State -->
+                <div id="history-empty" class="text-center py-12 text-navy/50 hidden">
+                    <p class="text-lg font-headline uppercase">No debugging history yet.</p>
+                    <p class="text-sm mt-2">Submit an error to get started!</p>
+                </div>
+            </section>
+
+            <!-- ANALYTICS SECTION (Placeholder) -->
+            <section id="analytics-section" class="mb-12 hidden">
+                <h2 class="text-2xl font-headline font-bold text-navy uppercase mb-6">
+                    Analytics Dashboard
+                </h2>
+                <div class="text-center py-12 text-navy/50">
+                    <p class="text-lg font-headline uppercase">Coming Soon</p>
+                    <p class="text-sm mt-2">Week 2 feature (Jan 4-10)</p>
                 </div>
             </section>
 
@@ -370,6 +412,7 @@
     <!-- Scripts -->
     <script src="session.js"></script>
     <script src="ui.js"></script>
+    <script src="history.js"></script>
     <script src="projects.js"></script>
     <script src="gemini.js"></script>
     <script src="firestore.js"></script>

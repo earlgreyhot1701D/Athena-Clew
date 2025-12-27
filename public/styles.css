@@ -44,3 +44,19 @@ h1, h2, h3, h4 {
     box-shadow: 12px 12px 0px rgba(26, 35, 50, 0.15);
     min-height: 100vh;
 }
+
+/* Tab Navigation */
+.tab-button {
+    border-bottom: 4px solid transparent;
+    transition: all 0.2s;
+    color: #1a2332;
+}
+
+.tab-button:hover {
+    color: #e6a641;
+}
+
+.tab-button.active {
+    border-bottom-color: #e6a641;
+    color: #e6a641;
+}
