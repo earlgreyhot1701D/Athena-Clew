@@ -20,7 +20,7 @@
         try {
             // Import from firebase/ai (NOT firebase/vertexai-preview)
             const { initializeApp } = await import('https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js');
-            const { getAI, getGenerativeModel, VertexAIBackend } = await import('https://www.gstatic.com/firebasejs/12.6.0/firebase-ai.js');
+            const { getAI, getGenerativeModel, GoogleAIBackend } = await import('https://www.gstatic.com/firebasejs/12.6.0/firebase-ai.js');
 
             // Validate config
             if (!window.REPO_CONFIG) {
@@ -33,15 +33,15 @@
             const app = initializeApp(window.REPO_CONFIG);
             console.log('✅ Firebase app initialized');
 
-            // Initialize AI with Vertex AI backend
+            // Initialize AI with Google AI backend (Gemini Developer API)
             const ai = getAI(app, {
-                backend: new VertexAIBackend()
+                backend: new GoogleAIBackend()
             });
             console.log('✅ AI backend initialized');
 
             // Create Gemini model
             const model = getGenerativeModel(ai, {
-                model: 'gemini-1.5-pro',
+                model: 'gemini-2.5-flash',
                 generationConfig: {
                     temperature: 0.3,
                     topP: 0.8,

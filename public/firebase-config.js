@@ -32,10 +32,8 @@ db.enableNetwork()
     .catch(err => console.error('❌ Network enable failed:', err));
 
 // Add connection state listener for debugging
-db.collection('_health_check').doc('ping').onSnapshot(
-    () => console.log('✅ Firestore connection active'),
-    (err) => console.error('❌ Firestore connection error:', err)
-);
+// Connection health check removed to avoid permission errors
+// db.collection('_health_check')...
 
 // Export globally
 window.db = db;
