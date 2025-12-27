@@ -188,9 +188,6 @@ const UI = {
           ${fixes.slice(0, 3).map(fix => `
             <div class="bg-cream p-3 rounded border border-navy/10">
               <p class="font-mono text-sm text-navy">${fix.fix.solution}</p>
-              <span class="text-xs text-navy/50">
-                Success rate: ${Math.round((fix.successRate || 0.5) * 100)}%
-              </span>
             </div>
           `).join('')}
         </div>
