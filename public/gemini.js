@@ -59,7 +59,7 @@ const Gemini = {
   ANALYZE and return ONLY a JSON object with this structure:
   {
     "classification": "syntax|dependency|logic|async|unknown",
-    "rootCause": "Brief explanation of what went wrong",
+    "rootCause": "Plain language explanation (use 'you', avoid jargon, explain like talking to a friend)",
     "patterns": ["Pattern 1", "Pattern 2"],
     "confidence": 0.0-1.0
   }
@@ -68,6 +68,13 @@ const Gemini = {
   1. What type of error is this?
   2. What patterns do you see in the stack trace?
   3. What is the likely root cause?
+  4. How would you explain this to a friend learning to code?
+
+  For rootCause, use plain language:
+  - Use "you" instead of passive voice
+  - Explain jargon in parentheses (e.g., "undefined = doesn't exist yet")
+  - Focus on what to check, not just what broke
+  - Keep under 2 sentences
   
   Return ONLY valid JSON, no other text.`;
 
@@ -159,7 +166,7 @@ const Gemini = {
   
   Return ONLY a JSON object:
   {
-    "principle": "When [specific pattern], then [general solution]",
+    "principle": "When [specific pattern in plain words], then [actionable steps anyone can follow]",
     "category": "async|dependency|state|logic|syntax|other",
     "reasoning": "Why this principle generalizes",
     "confidence": 0.0-1.0
@@ -169,6 +176,13 @@ const Gemini = {
   1. What was the underlying pattern?
   2. How can this apply to other situations?
   3. What's the general rule?
+  4. How would you explain this to someone new to coding?
+
+  For principle, use plain language:
+  - Avoid technical terms like "lifecycle", "initialized", "invoked"
+  - Use concrete action steps (check X, verify Y, look for Z)
+  - Keep under 30 words
+  - Make it feel like advice from a helpful mentor
   
   Return ONLY valid JSON.`;
 
