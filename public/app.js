@@ -254,12 +254,27 @@ const App = {
         try {
             window.ui.setButtonState(false);
 
-            // Store fix
+            // Build better error data (include type from analysis)
+            const errorData = {
+                message: this.currentFix.error.message,
+                stack: this.currentFix.error.stack || '',
+                type: this.currentFix.analysis?.classification || 'unknown'
+            };
+
+            // Build better fix data (use root cause if no explicit fix)
+            const fixData = this.currentFix.fix ? this.currentFix.fix : {
+                solution: this.currentFix.analysis?.rootCause
+                    ? `Root cause: ${this.currentFix.analysis.rootCause}. Resolved by user.`
+                    : 'Manual fix applied by user',
+                explanation: this.currentFix.analysis?.rootCause || 'User resolved this error manually'
+            };
+
+            // Store fix with better data
             const fixId = await window.FirestoreOps.storeFix(
                 sessionId,
                 projectId,
-                this.currentFix.error,
-                this.currentFix.fix || { solution: 'User manual fix' },
+                errorData,
+                fixData,
                 this.currentFix.analysis
             );
 
