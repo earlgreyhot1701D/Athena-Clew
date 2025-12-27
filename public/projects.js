@@ -163,6 +163,41 @@ const Projects = {
             console.error('Failed to update project:', error);
             throw error;
         }
+    },
+    /**
+     * Delete a project and all its data
+     * @param {string} sessionId 
+     * @param {string} projectId 
+     */
+    async delete(sessionId, projectId) {
+        try {
+            // Safety check: Don't allow deleting current project
+            if (this.currentProjectId === projectId) {
+                // Switch to another project first
+                const allProjects = await this.list(sessionId);
+                const otherProject = allProjects.find(p => p.id !== projectId);
+
+                if (!otherProject) {
+                    throw new Error('Cannot delete the only project. Create another project first.');
+                }
+
+                await this.setCurrent(sessionId, otherProject.id);
+            }
+
+            // Delete the project document
+            const projectRef = db.collection('sessions')
+                .doc(sessionId)
+                .collection('projects')
+                .doc(projectId);
+
+            await projectRef.delete();
+            console.log(`✅ Deleted project: ${projectId}`);
+
+            return true;
+        } catch (error) {
+            console.error('Failed to delete project:', error);
+            throw error;
+        }
     }
 };
 
