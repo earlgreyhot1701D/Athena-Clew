@@ -41,9 +41,12 @@
 
             // Create Gemini model
             const model = getGenerativeModel(ai, {
-                model: 'gemini-3-flash-preview', // Hackathon compliant
+                model: 'gemini-3-flash-preview',
                 generationConfig: {
-                    thinking: { budget_tokens: 5000 },
+                    thinkingConfig: {
+                        thinkingBudget: 5000,
+                        includeThoughts: true
+                    },
                     temperature: 0.3,
                     topP: 0.8,
                     topK: 40,
