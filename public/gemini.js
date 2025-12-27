@@ -235,13 +235,26 @@ const Gemini = {
      * @returns {Promise<Array>} Sorted by relevance
      */
     async rankSolutionsBySemantic(principles, currentError) {
-        // Simple implementation: score each principle
-        const scoredPrinciples = principles.map(p => ({
-            ...p,
-            relevanceScore: this._calculateRelevance(p, currentError)
-        }));
+        // Transform principles to UI-compatible solution format
+        const scoredPrinciples = principles.map(p => {
+            const relevanceScore = this._calculateRelevance(p, currentError);
 
-        return scoredPrinciples.sort((a, b) => b.relevanceScore - a.relevanceScore);
+            return {
+                // UI-expected fields
+                solution: p.principle,              // Rename: principle → solution
+                confidence: relevanceScore,          // Rename: relevanceScore → confidence
+                source: 'learned_principle',
+                category: p.category,
+
+                // Keep original data for reference
+                principleId: p.id,
+                originalPrinciple: p.principle,
+                context: p.context
+            };
+        });
+
+        // Sort by confidence (was relevanceScore)
+        return scoredPrinciples.sort((a, b) => b.confidence - a.confidence);
     },
 
     /**
