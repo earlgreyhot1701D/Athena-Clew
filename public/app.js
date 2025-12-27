@@ -214,7 +214,7 @@ const App = {
             // STEP 5: Ready for feedback (store on user click)
             this.currentFix = {
                 error: { message: errorInput, stack: '' },
-                fix: ranked.length > 0 ? { solution: ranked[0].principle } : null, // If null, we'll store a generic or ask user
+                fix: ranked.length > 0 ? { solution: ranked[0].solution } : null, // If null, we'll store a generic or ask user
                 analysis,
                 principle
             };
@@ -254,11 +254,53 @@ const App = {
         try {
             window.ui.setButtonState(false);
 
+            // Pattern-based classification fallback
+            function classifyError(message, geminiClassification) {
+                // Use Gemini classification if available and not 'unknown'
+                if (geminiClassification && geminiClassification !== 'unknown') {
+                    return geminiClassification;
+                }
+
+                // Fallback: Pattern matching on error message
+                const msg = message.toLowerCase();
+
+                if (msg.includes('cannot find module') ||
+                    msg.includes('module not found') ||
+                    msg.includes('npm') ||
+                    msg.includes('package')) {
+                    return 'dependency';
+                }
+
+                if (msg.includes('timeout') ||
+                    msg.includes('promise') ||
+                    msg.includes('async') ||
+                    msg.includes('await')) {
+                    return 'async';
+                }
+
+                if (msg.includes('typeerror') ||
+                    msg.includes('cannot read property') ||
+                    msg.includes('undefined') ||
+                    msg.includes('null')) {
+                    return 'logic';
+                }
+
+                if (msg.includes('syntaxerror') ||
+                    msg.includes('unexpected token')) {
+                    return 'syntax';
+                }
+
+                return 'unknown';
+            }
+
             // Build better error data (include type from analysis)
             const errorData = {
                 message: this.currentFix.error.message,
                 stack: this.currentFix.error.stack || '',
-                type: this.currentFix.analysis?.classification || 'unknown'
+                type: classifyError(
+                    this.currentFix.error.message,
+                    this.currentFix.analysis?.classification
+                )
             };
 
             // Build better fix data (use root cause if no explicit fix)
