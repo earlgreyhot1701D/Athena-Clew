@@ -128,7 +128,7 @@ const UI = {
             `).join('');
 
             const html = `
-                <div class="mt-4 border-3 border-amber bg-amber/5 p-6 animate-fade-in">
+                <div class="mt-4 mb-8 border-3 border-amber bg-amber/5 p-6 animate-fade-in">
                     <h3 class="font-headline font-bold text-navy text-xl mb-4">Step 4: Ranked Solutions</h3>
                     ${solutionsHtml}
                     <div class="mt-4 flex gap-2">
