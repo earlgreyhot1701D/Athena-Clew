@@ -15,7 +15,7 @@ const Gemini = {
         try {
             if (window.GeminiModel) {
                 this.model = window.GeminiModel;
-                console.log('✅ Gemini 2.5 Flash connected (via Window)');
+                console.log('✅ Gemini 3 Flash connected (via Window)');
             } else {
                 throw new Error('Vertex AI SDK not fully loaded');
             }

@@ -41,8 +41,9 @@
 
             // Create Gemini model
             const model = getGenerativeModel(ai, {
-                model: 'gemini-2.5-flash',
+                model: 'gemini-3-flash-preview', // Hackathon compliant
                 generationConfig: {
+                    thinking: { budget_tokens: 5000 },
                     temperature: 0.3,
                     topP: 0.8,
                     topK: 40,
@@ -138,6 +139,11 @@
                     class="bg-amber text-navy font-headline font-bold px-3 py-1.5 text-xs uppercase border-2 border-amber hover:bg-amber/90 transition rounded"
                     onclick="window.ProjectUI && window.ProjectUI.showNewProjectModal()">
                     + New
+                </button>
+                <button id="delete-project-btn"
+                    class="bg-transparent text-navy/40 font-headline font-bold px-3 py-1.5 text-xs uppercase border-2 border-navy/10 hover:border-red-500 hover:text-red-500 transition rounded ml-1"
+                    onclick="window.ProjectUI && window.ProjectUI.deleteProject()" title="Delete current project">
+                    ×
                 </button>
             </div>
 
@@ -463,6 +469,25 @@
                     await this.refreshProjectList(sessionId);
                     this.closeModal();
                     window.ui && window.ui.showSuccess(`Created "${name}"!`);
+                } catch (error) {
+                    window.ui && window.ui.showError(error.message);
+                }
+            },
+
+            async deleteProject() {
+                const select = document.getElementById('project-select');
+                const projectId = select.value;
+                if (!projectId) return;
+
+                if (!confirm(`Are you sure you want to delete "${projectId}"? This cannot be undone.`)) {
+                    return;
+                }
+
+                try {
+                    const sessionId = localStorage.getItem('athena_session_id');
+                    await window.Projects.delete(sessionId, projectId);
+                    window.ui && window.ui.showSuccess(`Deleted "${projectId}"`);
+                    await this.refreshProjectList(sessionId);
                 } catch (error) {
                     window.ui && window.ui.showError(error.message);
                 }
