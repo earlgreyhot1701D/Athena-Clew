@@ -128,10 +128,10 @@ const UI = {
             `).join('');
 
             const html = `
-                <div class="mt-4 mb-8 border-3 border-amber bg-amber/5 p-6 animate-fade-in">
+                <div id="step4-results" class="mt-6 p-6 bg-white border-3 border-navy/10 rounded">
                     <h3 class="font-headline font-bold text-navy text-xl mb-4">Step 4: Ranked Solutions</h3>
                     ${solutionsHtml}
-                    <div class="mt-4 flex gap-2">
+                    <div class="flex gap-4 mb-6">
                         <button onclick="window.app.handleHelpfulFeedback()" class="flex-1 bg-navy text-white font-headline font-bold py-2 hover:bg-navy/90 border-2 border-navy transition">
                             This Helped! (Store Principle)
                         </button>
