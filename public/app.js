@@ -122,6 +122,30 @@ const App = {
             // STEP 0: Verify project context
             console.log(`🚀 Starting pipeline for project: ${projectId}`);
 
+            // NEW: Check for personal patterns
+            try {
+                const patterns = await window.PersonalInsights.analyzeUserPatterns(sessionId, projectId);
+
+                if (patterns) {
+                    // Show personal insights before analysis
+                    // Note: We don't have analysis.classification yet, so we pass 'unknown' or try to guess?
+                    // The prompt asked for `analysis?.classification || 'unknown'`, but `analysis` isn't defined yet.
+                    // However, we can update the alert later or just pass 'unknown' for now.
+                    // Wait, the prompt says: `window.ui.displayPersonalInsights(patterns, analysis?.classification || 'unknown');`
+                    // But `analysis` is defined in Step 1.
+                    // Let's pass 'unknown' for the initial display since we haven't analyzed it yet.
+                    // OR better, we can delay the DISPLAY until we have the classification?
+                    // The prompt says "ADD this code BEFORE Step 1".
+                    // If I look at the prompt, it uses `analysis?.classification`. But analysis is defined... AFTER this block.
+                    // Ah, looking at the code I replaced: `let analysis;` is declared later.
+                    // I will check if I can quick-classify or just pass 'unknown' as a safe default.
+                    window.ui.displayPersonalInsights(patterns, 'unknown');
+                }
+            } catch (error) {
+                console.log('⏭️ Personal insights unavailable:', error.message);
+                // Non-critical, continue without insights
+            }
+
             // STEP 1: Analyze Error
             window.ui.showStepProgress(1, 'Analyzing error...');
             let analysis;

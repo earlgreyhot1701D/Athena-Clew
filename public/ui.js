@@ -103,12 +103,59 @@ const UI = {
                     </div>
                 </div>
             `;
-            this.elements.results.innerHTML = html;
+            this.elements.results.insertAdjacentHTML('beforeend', html);
 
         } catch (error) {
             console.error('Display Analysis Error:', error);
             this.showError(`Display Error: ${error.message}`);
         }
+    },
+
+    /**
+     * Display personal debugging patterns
+     * @param {object} patterns - User's pattern analysis
+     * @param {string} currentErrorType - Current error type
+     */
+    displayPersonalInsights(patterns, currentErrorType) {
+        if (!this.elements.results || !patterns) return;
+
+        const patternAlert = window.PersonalInsights.generatePatternAlert(patterns, currentErrorType);
+
+        // Build type breakdown HTML
+        const typeBreakdownHtml = patterns.typeBreakdown.slice(0, 3).map(t =>
+            `<span class="text-xs bg-navy/10 px-2 py-1 rounded">${t.type}: ${t.count}</span>`
+        ).join(' ');
+
+        const html = `
+            <div class="mb-6 border-4 border-amber bg-amber/10 p-6 animate-fade-in">
+                <div class="flex items-start gap-3 mb-4">
+                    <span class="text-2xl">⚡</span>
+                    <div class="flex-1">
+                        <h3 class="font-headline font-bold text-navy text-lg mb-2">YOUR DEBUGGING PATTERN</h3>
+                        <p class="text-sm text-navy/70 mb-3">
+                            ${patterns.totalErrors} error${patterns.totalErrors !== 1 ? 's' : ''} debugged • 
+                            ${typeBreakdownHtml}
+                        </p>
+                        
+                        ${patterns.growthMetric ? `
+                            <p class="text-sm text-green-700 font-bold mb-3">
+                                ${patterns.growthMetric.message}
+                            </p>
+                        ` : ''}
+                        
+                        ${patternAlert ? `
+                            <div class="bg-amber/20 border-2 border-amber/40 p-3 rounded">
+                                <p class="text-sm font-bold text-amber-900">💡 Pattern Alert:</p>
+                                <p class="text-sm text-amber-900">${patternAlert}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+                <p class="text-xs text-navy/50 italic">Theseus learns YOUR patterns - personalized debugging just for you!</p>
+            </div>
+        `;
+
+        this.elements.results.innerHTML = html;
     },
 
     displaySolutions(solutions) {
