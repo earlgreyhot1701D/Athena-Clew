@@ -97,51 +97,88 @@ const PersonalInsights = {
     },
 
     /**
-     * Detect if user has debugged similar error before
+     * Detect similar errors across ALL projects (cross-project learning)
      * @param {string} currentError - Current error message
      * @param {string} sessionId
-     * @param {string} projectId
-     * @returns {Promise<object|null>} Similar fix or null
+     * @returns {Promise<object|null>} Similar fix from any project, or null
      */
-    async detectSimilarError(currentError, sessionId, projectId) {
-        // Get all past fixes
-        const allFixes = await window.FirestoreOps.getAllFixesForProject(sessionId, projectId);
+    async detectSimilarError(currentError, sessionId) {
+        try {
+            // Get ALL projects for this session
+            const allProjects = await window.Projects.getAllProjects(sessionId);
 
-        if (allFixes.length === 0) {
-            return null; // No history
-        }
-
-        // Find similar errors
-        const similarFixes = [];
-
-        for (const fix of allFixes) {
-            const similarity = this._calculateTextSimilarity(
-                currentError.toLowerCase(),
-                fix.error.message.toLowerCase()
-            );
-
-            if (similarity > 0.7) { // 70% similar threshold
-                similarFixes.push({
-                    ...fix,
-                    similarity
-                });
+            if (!allProjects || allProjects.length === 0) {
+                return null; // No projects yet
             }
-        }
 
-        if (similarFixes.length === 0) {
-            return null; // No similar errors found
-        }
+            // Gather fixes from ALL projects
+            let allFixes = [];
 
-        // Return most recent similar fix
-        similarFixes.sort((a, b) => {
-            // Sort by similarity first, then recency
-            if (Math.abs(a.similarity - b.similarity) < 0.1) {
-                return b.timestamp?.toMillis() - a.timestamp?.toMillis();
+            for (const project of allProjects) {
+                try {
+                    const fixes = await window.FirestoreOps.getAllFixesForProject(sessionId, project.id);
+
+                    // Tag each fix with its project info
+                    const taggedFixes = fixes.map(fix => ({
+                        ...fix,
+                        fromProjectId: project.id,
+                        fromProjectName: project.name
+                    }));
+
+                    allFixes = allFixes.concat(taggedFixes);
+                } catch (error) {
+                    console.warn(`Could not load fixes from project ${project.id}:`, error);
+                    // Continue with other projects
+                }
             }
-            return b.similarity - a.similarity;
-        });
 
-        return similarFixes[0];
+            if (allFixes.length === 0) {
+                return null; // No history yet
+            }
+
+            // Find similar errors (same logic as before)
+            const similarFixes = [];
+
+            for (const fix of allFixes) {
+                const similarity = this._calculateTextSimilarity(
+                    currentError.toLowerCase(),
+                    fix.error.message.toLowerCase()
+                );
+
+                if (similarity > 0.7) { // 70% similar threshold
+                    similarFixes.push({
+                        ...fix,
+                        similarity
+                    });
+                }
+            }
+
+            if (similarFixes.length === 0) {
+                return null; // No similar errors found
+            }
+
+            // Return most recent similar fix
+            similarFixes.sort((a, b) => {
+                // Sort by similarity first, then recency
+                if (Math.abs(a.similarity - b.similarity) < 0.1) {
+                    return b.timestamp?.toMillis() - a.timestamp?.toMillis();
+                }
+                return b.similarity - a.similarity;
+            });
+
+            const mostSimilar = similarFixes[0];
+
+            // Add context about cross-project learning
+            return {
+                ...mostSimilar,
+                isCrossProject: mostSimilar.fromProjectId !== window.Projects.getCurrent(),
+                totalSimilarAcrossProjects: similarFixes.length
+            };
+
+        } catch (error) {
+            console.error('Error detecting similar errors across projects:', error);
+            return null;
+        }
     },
 
     /**

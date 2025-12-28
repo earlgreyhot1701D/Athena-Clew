@@ -118,6 +118,15 @@ const Projects = {
     },
 
     /**
+     * Alias for list() to support cross-project insights
+     * @param {string} sessionId
+     * @returns {Promise<Array>} projects
+     */
+    async getAllProjects(sessionId) {
+        return this.list(sessionId);
+    },
+
+    /**
      * Set current active project
      * @param {string} sessionId 
      * @param {string} projectId 

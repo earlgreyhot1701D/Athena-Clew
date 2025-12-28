@@ -277,7 +277,7 @@ const UI = {
     },
 
     /**
-     * Display déjà vu alert when similar error found
+     * Display déjà vu alert with supportive, educational tone
      * @param {object} similarFix - Past fix that matches
      * @param {string} currentError - Current error message
      */
@@ -289,14 +289,29 @@ const UI = {
             ? similarFix.timestamp.toDate().toLocaleDateString()
             : 'recently';
 
+        // Cross-project messaging
+        const projectContext = similarFix.isCrossProject
+            ? `in your "${similarFix.fromProjectName}" project`
+            : 'in this project';
+
+        const crossProjectInsight = similarFix.isCrossProject && similarFix.totalSimilarAcrossProjects > 1
+            ? `<div class="bg-blue-50 border-2 border-blue-300 p-3 rounded mt-3">
+                 <p class="text-xs text-blue-700 font-bold mb-1">🎯 Cross-Project Learning:</p>
+                 <p class="text-sm text-blue-800">
+                    You've worked through this challenge in ${similarFix.totalSimilarAcrossProjects} different projects.
+                    You're building transferable expertise!
+                 </p>
+               </div>`
+            : '';
+
         const html = `
             <div class="mb-6 border-4 border-green-500 bg-green-50 p-6 animate-fade-in">
                 <div class="flex items-start gap-3 mb-4">
                     <span class="text-3xl">⏪</span>
                     <div class="flex-1">
-                        <h3 class="font-headline font-bold text-green-900 text-xl mb-2">DÉJÀ VU ALERT!</h3>
+                        <h3 class="font-headline font-bold text-green-900 text-xl mb-2">LEARNING MOMENT!</h3>
                         <p class="text-sm text-green-800 mb-4">
-                            You fixed something similar on <strong>${fixDate}</strong>:
+                            You worked through this ${projectContext} on <strong>${fixDate}</strong>:
                         </p>
                         
                         <div class="bg-white border-2 border-green-300 p-4 rounded mb-4">
@@ -304,37 +319,39 @@ const UI = {
                             
                             ${similarFix.fix?.solution ? `
                                 <div class="border-t-2 border-green-200 pt-3">
-                                    <p class="text-xs text-green-700 font-bold mb-2">✅ What worked for you then:</p>
+                                    <p class="text-xs text-green-700 font-bold mb-2">✅ What worked:</p>
                                     <p class="text-sm text-navy">${similarFix.fix.solution}</p>
                                 </div>
                             ` : ''}
                             
                             ${similarFix.principle?.principle ? `
                                 <div class="border-t-2 border-green-200 pt-3 mt-3">
-                                    <p class="text-xs text-green-700 font-bold mb-2">💡 Your note to self:</p>
+                                    <p class="text-xs text-green-700 font-bold mb-2">💡 What you learned:</p>
                                     <p class="text-sm italic text-navy">"${similarFix.principle.principle}"</p>
                                 </div>
                             ` : ''}
                         </div>
                         
-                        <div class="flex gap-3">
+                        ${crossProjectInsight}
+                        
+                        <div class="flex gap-3 mt-4">
                             <button 
                                 onclick="window.app.handleUsePastFix()"
                                 class="flex-1 bg-green-600 hover:bg-green-700 text-white font-headline font-bold py-3 px-4 border-3 border-green-700 transition">
-                                ✅ Use This Fix
+                                ✅ Apply This Solution
                             </button>
                             <button 
                                 onclick="window.app.handleContinueAnalysis()"
                                 class="flex-1 bg-white hover:bg-gray-50 text-navy font-headline font-bold py-3 px-4 border-3 border-navy/20 transition">
-                                🔍 Different Approach
+                                🔍 Try a Different Approach
                             </button>
                         </div>
                     </div>
                 </div>
                 
                 <p class="text-xs text-green-700 italic mt-4">
-                    ${Math.round(similarFix.similarity * 100)}% similar to your past error - 
-                    Theseus remembers what worked for YOU!
+                    ${Math.round(similarFix.similarity * 100)}% similar - 
+                    Theseus remembers your solutions and helps you apply them again!
                 </p>
             </div>
         `;

@@ -151,8 +151,7 @@ const App = {
                 try {
                     const similarFix = await window.PersonalInsights.detectSimilarError(
                         errorInput,
-                        sessionId,
-                        projectId
+                        sessionId
                     );
 
                     if (similarFix) {
