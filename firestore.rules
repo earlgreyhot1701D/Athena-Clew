@@ -2,9 +2,21 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /sessions/{sessionId} {
+      // Allow read/write for MVP (client-side sessionId matching)
+      // For V2: Add authentication check: request.auth != null
       allow read, write: if true;
-      match /{document=**} {
+      
+      // Nested collections inherit parent permissions
+      match /projects/{projectId} {
         allow read, write: if true;
+        
+        match /fixes/{fixId} {
+          allow read, write: if true;
+        }
+        
+        match /principles/{principleId} {
+          allow read, write: if true;
+        }
       }
     }
   }
