@@ -133,7 +133,7 @@ const UI = {
                     <div class="flex-1">
                         <h3 class="font-headline font-bold text-navy text-lg mb-2">YOUR DEBUGGING PATTERN</h3>
                         <p class="text-sm text-navy/70 mb-3">
-                            ${patterns.totalErrors} error${patterns.totalErrors !== 1 ? 's' : ''} debugged • 
+                            ${patterns.totalErrors} debugging session${patterns.totalErrors !== 1 ? 's' : ''} completed • 
                             ${typeBreakdownHtml}
                         </p>
                         
@@ -145,7 +145,7 @@ const UI = {
                         
                         ${patternAlert ? `
                             <div class="bg-amber/20 border-2 border-amber/40 p-3 rounded">
-                                <p class="text-sm font-bold text-amber-900">💡 Pattern Alert:</p>
+                                <p class="text-sm font-bold text-amber-900">📚 Learning Pattern:</p>
                                 <p class="text-sm text-amber-900">${patternAlert}</p>
                             </div>
                         ` : ''}

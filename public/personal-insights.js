@@ -66,8 +66,8 @@ const PersonalInsights = {
         return {
             isImproving: typeFixes.length > 5,
             message: typeFixes.length > 5
-                ? `You're getting faster at ${errorType} errors!`
-                : `You're learning ${errorType} patterns`
+                ? `Great progress! You're mastering ${errorType} patterns through practice!`
+                : `You're building your ${errorType} debugging skills - keep going!`
         };
     },
 
@@ -86,11 +86,11 @@ const PersonalInsights = {
         const currentTypeData = patterns.typeBreakdown.find(t => t.type === currentErrorType);
 
         if (currentTypeData && currentTypeData.count >= 3) {
-            return `You often hit ${currentErrorType} errors - this is #${currentTypeData.count + 1}!`;
+            return `You're practicing ${currentErrorType} patterns - this is session #${currentTypeData.count + 1}! Each encounter strengthens your skills.`;
         }
 
         if (patterns.mostCommon.type === currentErrorType) {
-            return `${currentErrorType} is your most common error type (${patterns.mostCommon.percentage}%)`;
+            return `You're building expertise in ${currentErrorType} patterns (${patterns.mostCommon.percentage}% of your practice)`;
         }
 
         return null;
