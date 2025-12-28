@@ -94,7 +94,94 @@ const PersonalInsights = {
         }
 
         return null;
-    }
+    },
+
+    /**
+     * Detect if user has debugged similar error before
+     * @param {string} currentError - Current error message
+     * @param {string} sessionId
+     * @param {string} projectId
+     * @returns {Promise<object|null>} Similar fix or null
+     */
+    async detectSimilarError(currentError, sessionId, projectId) {
+        // Get all past fixes
+        const allFixes = await window.FirestoreOps.getAllFixesForProject(sessionId, projectId);
+
+        if (allFixes.length === 0) {
+            return null; // No history
+        }
+
+        // Find similar errors
+        const similarFixes = [];
+
+        for (const fix of allFixes) {
+            const similarity = this._calculateTextSimilarity(
+                currentError.toLowerCase(),
+                fix.error.message.toLowerCase()
+            );
+
+            if (similarity > 0.7) { // 70% similar threshold
+                similarFixes.push({
+                    ...fix,
+                    similarity
+                });
+            }
+        }
+
+        if (similarFixes.length === 0) {
+            return null; // No similar errors found
+        }
+
+        // Return most recent similar fix
+        similarFixes.sort((a, b) => {
+            // Sort by similarity first, then recency
+            if (Math.abs(a.similarity - b.similarity) < 0.1) {
+                return b.timestamp?.toMillis() - a.timestamp?.toMillis();
+            }
+            return b.similarity - a.similarity;
+        });
+
+        return similarFixes[0];
+    },
+
+    /**
+     * Calculate text similarity between two strings
+     * Simple word-overlap algorithm (no ML needed)
+     * @param {string} text1
+     * @param {string} text2
+     * @returns {number} Similarity score 0.0-1.0
+     */
+    _calculateTextSimilarity(text1, text2) {
+        // Tokenize: split on spaces and remove special chars
+        const tokenize = (text) => {
+            return text
+                .replace(/[^a-z0-9\s]/g, ' ')
+                .split(/\s+/)
+                .filter(w => w.length > 2); // Ignore short words
+        };
+
+        const words1 = tokenize(text1);
+        const words2 = tokenize(text2);
+
+        if (words1.length === 0 || words2.length === 0) {
+            return 0;
+        }
+
+        // Count common words
+        const set1 = new Set(words1);
+        const set2 = new Set(words2);
+
+        let commonCount = 0;
+        for (const word of set1) {
+            if (set2.has(word)) {
+                commonCount++;
+            }
+        }
+
+        // Jaccard similarity: intersection / union
+        const union = set1.size + set2.size - commonCount;
+        return commonCount / union;
+    },
 };
 
 // Export

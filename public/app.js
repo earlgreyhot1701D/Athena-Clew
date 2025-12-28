@@ -146,6 +146,33 @@ const App = {
                 // Non-critical, continue without insights
             }
 
+            // NEW: Check for déjà vu (similar past error)
+            if (!this.skipDejavu) {
+                try {
+                    const similarFix = await window.PersonalInsights.detectSimilarError(
+                        errorInput,
+                        sessionId,
+                        projectId
+                    );
+
+                    if (similarFix) {
+                        // Show déjà vu alert
+                        window.ui.displayDejavu(similarFix, errorInput);
+
+                        // Store for "Use This Fix" button
+                        this.currentDejavu = similarFix;
+
+                        // Wait for user decision: Use fix or continue
+                        this.isProcessing = false; // Reset processing flag so buttons work
+                        window.ui.setButtonState(true);
+                        return; // Don't proceed to Step 1 yet
+                    }
+                } catch (error) {
+                    console.log('⏭️ Déjà vu check unavailable:', error.message);
+                    // Non-critical, continue
+                }
+            }
+
             // STEP 1: Analyze Error
             window.ui.showStepProgress(1, 'Analyzing error...');
             let analysis;
@@ -403,6 +430,56 @@ const App = {
         window.ui.clearResults();
         this.currentFix = null;
         window.ui.showSuccess('Ready for another error!');
+    },
+
+    async handleUsePastFix() {
+        if (!this.currentDejavu) {
+            window.ui.showError('No past fix available');
+            return;
+        }
+
+        try {
+            // Show the past solution
+            window.ui.displayPastFixSolution(this.currentDejavu);
+
+            // Skip to Step 5 (feedback)
+            this.currentFix = {
+                error: { message: this.currentDejavu.error.message },
+                fix: this.currentDejavu.fix,
+                analysis: this.currentDejavu.analysis,
+                principle: this.currentDejavu.principle
+            };
+
+            window.ui.showFeedbackButtons();
+            window.ui.showStepProgress(5, 'Used past fix - was it helpful?');
+
+        } catch (error) {
+            console.error('Use past fix failed:', error);
+            window.ui.showError('Could not apply past fix');
+        }
+    },
+
+    async handleContinueAnalysis() {
+        // User chose to do new analysis instead of using past fix
+        this.currentDejavu = null;
+        window.ui.clearResults();
+
+        // Now run the normal pipeline
+        const errorInput = document.getElementById('error-input').value; // Re-grab value
+        // Note: we can't just call runDebugPipeline because it's not exported or named separately in this file structure, 
+        // logic is inside handleSubmit. We should re-trigger handleSubmit but bypass the check we just added?
+        // Actually, preventing infinite loop is key.
+        // Option 1: Add a 'force' param to handleSubmit. 
+        // Option 2: Just Copy-paste logic? Bad.
+        // Option 3: Refactor handleSubmit to extract pipeline.
+        // Given constraints "DO NOT modify existing Step 1-5 logic", I should probably trigger handleSubmit 
+        // but finding a way to skip the checks.
+
+        // Simpler approach for this specific prompt intervention:
+        // Set a flag to skip detection for the next run.
+        this.skipDejavu = true;
+        await this.handleSubmit();
+        this.skipDejavu = false;
     }
 };
 

@@ -277,6 +277,106 @@ const UI = {
     },
 
     /**
+     * Display déjà vu alert when similar error found
+     * @param {object} similarFix - Past fix that matches
+     * @param {string} currentError - Current error message
+     */
+    displayDejavu(similarFix, currentError) {
+        if (!this.elements.results || !similarFix) return;
+
+        // Format date
+        const fixDate = similarFix.timestamp?.toDate
+            ? similarFix.timestamp.toDate().toLocaleDateString()
+            : 'recently';
+
+        const html = `
+            <div class="mb-6 border-4 border-green-500 bg-green-50 p-6 animate-fade-in">
+                <div class="flex items-start gap-3 mb-4">
+                    <span class="text-3xl">⏪</span>
+                    <div class="flex-1">
+                        <h3 class="font-headline font-bold text-green-900 text-xl mb-2">DÉJÀ VU ALERT!</h3>
+                        <p class="text-sm text-green-800 mb-4">
+                            You fixed something similar on <strong>${fixDate}</strong>:
+                        </p>
+                        
+                        <div class="bg-white border-2 border-green-300 p-4 rounded mb-4">
+                            <p class="font-mono text-sm text-navy mb-3">"${similarFix.error.message}"</p>
+                            
+                            ${similarFix.fix?.solution ? `
+                                <div class="border-t-2 border-green-200 pt-3">
+                                    <p class="text-xs text-green-700 font-bold mb-2">✅ What worked for you then:</p>
+                                    <p class="text-sm text-navy">${similarFix.fix.solution}</p>
+                                </div>
+                            ` : ''}
+                            
+                            ${similarFix.principle?.principle ? `
+                                <div class="border-t-2 border-green-200 pt-3 mt-3">
+                                    <p class="text-xs text-green-700 font-bold mb-2">💡 Your note to self:</p>
+                                    <p class="text-sm italic text-navy">"${similarFix.principle.principle}"</p>
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="flex gap-3">
+                            <button 
+                                onclick="window.app.handleUsePastFix()"
+                                class="flex-1 bg-green-600 hover:bg-green-700 text-white font-headline font-bold py-3 px-4 border-3 border-green-700 transition">
+                                ✅ Use This Fix
+                            </button>
+                            <button 
+                                onclick="window.app.handleContinueAnalysis()"
+                                class="flex-1 bg-white hover:bg-gray-50 text-navy font-headline font-bold py-3 px-4 border-3 border-navy/20 transition">
+                                🔍 Different Approach
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <p class="text-xs text-green-700 italic mt-4">
+                    ${Math.round(similarFix.similarity * 100)}% similar to your past error - 
+                    Theseus remembers what worked for YOU!
+                </p>
+            </div>
+        `;
+
+        this.elements.results.innerHTML = html;
+    },
+
+    /**
+     * Display the past fix solution when user clicks "Use This Fix"
+     * @param {object} pastFix - The fix to display
+     */
+    displayPastFixSolution(pastFix) {
+        if (!this.elements.results) return;
+
+        const html = `
+            <div class="border-3 border-green-500 bg-white p-6 mb-6">
+                <h3 class="font-headline font-bold text-navy text-xl mb-4">
+                    ✅ Using Your Past Solution
+                </h3>
+                
+                <div class="bg-green-50 border-2 border-green-300 p-4 rounded mb-4">
+                    ${pastFix.fix?.solution ? `
+                        <p class="text-sm text-navy mb-3"><strong>Solution:</strong></p>
+                        <p class="text-sm text-navy mb-4">${pastFix.fix.solution}</p>
+                    ` : ''}
+                    
+                    ${pastFix.principle?.principle ? `
+                        <p class="text-sm text-navy mb-3"><strong>Remember:</strong></p>
+                        <p class="text-sm italic text-navy">${pastFix.principle.principle}</p>
+                    ` : ''}
+                </div>
+                
+                <p class="text-xs text-green-700">
+                    This solution worked for you before. Try it again!
+                </p>
+            </div>
+        `;
+
+        this.elements.results.insertAdjacentHTML('beforeend', html);
+    },
+
+    /**
      * Clear results area
      */
     clearResults() {
