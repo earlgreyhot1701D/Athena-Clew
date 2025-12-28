@@ -58,7 +58,7 @@ window.HistoryView = {
         const errorMsg = rawError.length > 80 ? rawError.substring(0, 80) + '...' : rawError;
 
         // Determine type badge color
-        const type = fix.analysis?.classification || 'Unknown';
+        const type = fix.error?.type || 'Unknown';
         let badgeClass = 'bg-navy/10 text-navy';
         if (type.includes('Syntax')) badgeClass = 'bg-red-100 text-red-800';
         else if (type.includes('Logic')) badgeClass = 'bg-amber-100 text-amber-900';
