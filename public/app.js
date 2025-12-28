@@ -228,7 +228,29 @@ const App = {
 
         } catch (error) {
             console.error('Pipeline failed:', error);
-            window.ui.showError(`Pipeline failed: ${error.message}`);
+
+            // Better error messages for common issues
+            if (error.message.includes('429') ||
+                error.message.includes('quota') ||
+                error.message.includes('rate limit')) {
+                window.ui.showError(
+                    '⏰ Gemini API rate limit reached (20 requests/day on free tier). ' +
+                    'Quota resets daily. Pattern-based classification is working as fallback!'
+                );
+            } else if (error.message.includes('AI/fetch-error') ||
+                error.message.includes('network')) {
+                window.ui.showError(
+                    '🌐 AI service temporarily unavailable. ' +
+                    'Using pattern-based fallback classification.'
+                );
+            } else if (error.message.includes('No project selected')) {
+                window.ui.showError(
+                    '⚠️ Please create or select a project first using the dropdown above.'
+                );
+            } else {
+                // Fallback: show original error
+                window.ui.showError(`Pipeline failed: ${error.message}`);
+            }
         } finally {
             this.isProcessing = false;
             window.ui.setButtonState(true); // Reset button
