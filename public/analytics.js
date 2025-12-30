@@ -37,14 +37,23 @@ const Analytics = {
             }
 
             // Calculate success rate
-            const helpfulFixes = allFixes.filter(f => f.userFeedback?.helpful === true);
+            // Calculate success rate
+            // Count as success if explicitly marked helpful OR if it has a solution and wasn't marked unhelpful
+            const helpfulFixes = allFixes.filter(f =>
+                f.userFeedback?.helpful === true ||
+                (f.userFeedback?.helpful !== false && f.fix?.solution)
+            );
+
             const successRate = allFixes.length > 0
                 ? Math.round((helpfulFixes.length / allFixes.length) * 100)
                 : 0;
 
+            // Count UNIQUE principles by text
+            const uniquePrinciples = new Set(allPrinciples.map(p => p.principle)).size;
+
             return {
                 totalSessions: allFixes.length,
-                totalPrinciples: allPrinciples.length,
+                totalPrinciples: uniquePrinciples, // Was allPrinciples.length
                 successRate: successRate,
                 totalProjects: allProjects.length
             };

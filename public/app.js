@@ -205,9 +205,25 @@ const App = {
                 analysis.classification
             );
 
-            // Cold Start Handling: Show message but continue
+            // Cold Start Handling: Try Cross-Project Search
             if (pastFixes.length === 0) {
-                console.log('ℹ️ Cold Start: No past fixes found (this is your first!).');
+                console.log('ℹ️ No local fixes. Searching across all projects...');
+                try {
+                    const globalFixes = await window.FirestoreOps.searchAcrossAllProjects(
+                        sessionId,
+                        analysis.classification
+                    );
+
+                    if (globalFixes.length > 0) {
+                        pastFixes.push(...globalFixes);
+                        console.log(`✅ Found ${globalFixes.length} fixes from other projects!`);
+                        window.ui.showStepProgress(2, 'Found solutions from your other projects!');
+                    } else {
+                        console.log('ℹ️ Cold Start: No past fixes found globally.');
+                    }
+                } catch (err) {
+                    console.warn('Cross-project search failed:', err);
+                }
             }
             window.ui.displayPastFixes(pastFixes);
             console.log(`✅ Step 2 complete: Found ${pastFixes.length} past fixes`);
@@ -384,6 +400,7 @@ const App = {
             };
 
             // Store fix with better data
+            // Store fix with better data
             const fixId = await window.FirestoreOps.storeFix(
                 sessionId,
                 projectId,
@@ -393,6 +410,23 @@ const App = {
             );
 
             console.log(`✅ Fix stored: ${fixId}`);
+
+            // NEW: If we didn't extract a principle earlier (e.g. Cold Start), do it now!
+            if (!this.currentFix.principle && window.Gemini) {
+                try {
+                    console.log('🎓 Extracting principle from new fix...');
+                    const newPrinciple = await window.Gemini.extractPrinciple(
+                        { message: errorData.message },
+                        fixData,
+                        this.currentFix.analysis
+                    );
+                    if (newPrinciple) {
+                        this.currentFix.principle = newPrinciple;
+                    }
+                } catch (err) {
+                    console.warn('Could not extract principle on-the-fly:', err);
+                }
+            }
 
             // Store principle (if extracted)
             if (this.currentFix.principle) {
@@ -405,7 +439,7 @@ const App = {
                 console.log(`✅ Principle stored: ${principleId}`);
                 window.ui.showSuccess('Principle learned! 🎓');
             } else {
-                window.ui.showSuccess('Fix saved!');
+                window.ui.showSuccess('Fix saved! (No principle extracted)');
             }
 
             // Clear form
