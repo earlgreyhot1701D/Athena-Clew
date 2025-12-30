@@ -37,7 +37,6 @@ const Analytics = {
             }
 
             // Calculate success rate
-            // Calculate success rate
             // Count as success if explicitly marked helpful OR if it has a solution and wasn't marked unhelpful
             const helpfulFixes = allFixes.filter(f =>
                 f.userFeedback?.helpful === true ||
