@@ -178,13 +178,19 @@ const FirestoreOps = {
      */
     async queryPrinciples(sessionId, projectId, category, limit = 5) {
         try {
-            const principlesRef = db.collection('sessions')
+            let principlesRef = db.collection('sessions')
                 .doc(sessionId)
                 .collection('projects')
                 .doc(projectId)
-                .collection('principles')
-                .where('category', '==', category)
-                .orderBy('context.successRate', 'desc')
+                .collection('principles');
+
+            // Only filter by category if one is provided
+            if (category) {
+                principlesRef = principlesRef.where('category', '==', category);
+            }
+
+            // Always order by success rate
+            principlesRef = principlesRef.orderBy('context.successRate', 'desc')
                 .limit(limit);
 
             const snapshot = await principlesRef.get();
@@ -196,6 +202,7 @@ const FirestoreOps = {
 
         } catch (error) {
             console.error('Query principles failed:', error);
+            // Don't swallow error completely if we want to debug, but returning [] handles loading state
             return [];
         }
     },

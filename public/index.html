@@ -163,7 +163,8 @@
             <button id="tab-history" class="tab-button px-6 py-3 font-headline font-bold uppercase text-sm">
                 📜 History
             </button>
-            <button id="tab-analytics" class="tab-button px-6 py-3 font-headline font-bold uppercase text-sm">
+            <button id="tab-analytics" onclick="window.app.handleAnalyticsTab()"
+                class="tab-button px-6 py-3 font-headline font-bold uppercase text-sm">
                 📊 Analytics
             </button>
         </nav>
@@ -263,14 +264,13 @@
                 </div>
             </section>
 
-            <!-- ANALYTICS SECTION (Placeholder) -->
+            <!-- ANALYTICS SECTION -->
             <section id="analytics-section" class="mb-12 hidden">
                 <h2 class="text-2xl font-headline font-bold text-navy uppercase mb-6">
                     Analytics Dashboard
                 </h2>
-                <div class="text-center py-12 text-navy/50">
-                    <p class="text-lg font-headline uppercase">Coming Soon</p>
-                    <p class="text-sm mt-2">Week 2 feature (Jan 4-10)</p>
+                <div id="analytics-results">
+                    <!-- Populated by analytics.js -->
                 </div>
             </section>
 
@@ -414,6 +414,7 @@
     <script src="history.js"></script>
     <script src="projects.js"></script>
     <script src="personal-insights.js"></script>
+    <script src="analytics.js"></script>
     <script src="gemini.js"></script>
     <script src="firestore.js"></script>
     <script src="app.js"></script>

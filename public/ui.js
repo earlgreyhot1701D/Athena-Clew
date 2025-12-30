@@ -11,7 +11,8 @@ const UI = {
         getHelpBtn: null,
         results: null,
         demoForm: null,
-        resultsArea: null
+        resultsArea: null,
+        analyticsResults: null
     },
 
     state: {
@@ -23,6 +24,7 @@ const UI = {
         this.elements.getHelpBtn = document.getElementById('get-help-btn');
         this.elements.results = document.getElementById('results');
         this.elements.demoForm = document.getElementById('theseus-demo');
+        this.elements.analyticsResults = document.getElementById('analytics-results');
     },
 
     setLoading(isLoading) {
@@ -413,7 +415,259 @@ const UI = {
         // Fallback if ID differs
         const input = document.getElementById('error-input');
         if (input) input.value = '';
-    }
+    },
+
+    /**
+     * Display analytics stats cards
+     * @param {object} stats - Aggregate statistics
+     */
+    displayAnalyticsStats(stats) {
+        // Target analytics container if available for new layout, else fallback
+        const container = this.elements.analyticsResults || this.elements.results;
+        if (!container) return;
+
+        if (!stats) {
+            container.innerHTML = `
+                <div class="text-center py-12">
+                    <p class="text-navy/60 text-lg mb-4">No debugging data yet</p>
+                    <p class="text-sm text-navy/50">Start debugging to see your analytics!</p>
+                </div>
+            `;
+            return;
+        }
+
+        const html = `
+            <div class="mb-8">
+                <h2 class="font-headline font-bold text-navy text-2xl mb-6 uppercase">
+                    📊 Your Learning Journey
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    <!-- Stat Card 1: Sessions -->
+                    <div class="bg-white border-3 border-navy/20 p-6 shadow-craft">
+                        <div class="text-4xl font-headline font-black text-amber mb-2">
+                            ${stats.totalSessions}
+                        </div>
+                        <div class="text-sm text-navy/70 uppercase font-headline">
+                            Debugging Sessions Completed
+                        </div>
+                    </div>
+                    
+                    <!-- Stat Card 2: Principles -->
+                    <div class="bg-white border-3 border-navy/20 p-6 shadow-craft">
+                        <div class="text-4xl font-headline font-black text-green-600 mb-2">
+                            ${stats.totalPrinciples}
+                        </div>
+                        <div class="text-sm text-navy/70 uppercase font-headline">
+                            Principles Learned
+                        </div>
+                    </div>
+                    
+                    <!-- Stat Card 3: Success Rate -->
+                    <div class="bg-white border-3 border-navy/20 p-6 shadow-craft">
+                        <div class="text-4xl font-headline font-black text-blue-600 mb-2">
+                            ${stats.successRate}%
+                        </div>
+                        <div class="text-sm text-navy/70 uppercase font-headline">
+                            Solution Success Rate
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-green-50 border-2 border-green-300 p-4 rounded mb-8">
+                    <p class="text-sm text-green-800">
+                        <span class="font-bold">🎯 Growth Insight:</span> 
+                        You've completed ${stats.totalSessions} debugging sessions across 
+                        ${stats.totalProjects} project${stats.totalProjects !== 1 ? 's' : ''}.
+                        You're building real expertise!
+                    </p>
+                </div>
+            </div>
+        `;
+
+        container.innerHTML = html;
+    },
+
+    /**
+     * Display error type breakdown with CSS bars
+     * @param {Array} breakdown - Error types with percentages
+     */
+    displayErrorBreakdown(breakdown) {
+        const container = this.elements.analyticsResults || this.elements.results;
+        if (!container || !breakdown || breakdown.length === 0) {
+            return;
+        }
+
+        // Color mapping for error types
+        const colorMap = {
+            'dependency': 'bg-red-500',
+            'async': 'bg-blue-500',
+            'logic': 'bg-yellow-500',
+            'syntax': 'bg-purple-500',
+            'unknown': 'bg-gray-500'
+        };
+
+        const barsHtml = breakdown.map(item => {
+            const color = colorMap[item.type] || 'bg-gray-500';
+
+            return `
+                <div class="mb-4">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm font-headline font-bold text-navy uppercase">
+                            ${item.type}
+                        </span>
+                        <span class="text-xs text-navy/60">
+                            ${item.count} session${item.count !== 1 ? 's' : ''} (${item.percentage}%)
+                        </span>
+                    </div>
+                    <div class="w-full bg-navy/10 h-6 rounded overflow-hidden">
+                        <div class="${color} h-full transition-all duration-500" 
+                             style="width: ${item.percentage}%">
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        const html = `
+            <div class="border-3 border-navy/20 bg-white p-6 mb-8">
+                <h3 class="font-headline font-bold text-navy text-xl mb-4 uppercase">
+                    Practice Areas
+                </h3>
+                <p class="text-sm text-navy/60 mb-6">
+                    Your debugging practice breakdown by challenge type
+                </p>
+                ${barsHtml}
+            </div>
+        `;
+
+        container.insertAdjacentHTML('beforeend', html);
+    },
+
+    /**
+     * Display cross-project statistics
+     * @param {Array} projectStats - Per-project data
+     */
+    displayCrossProjectStats(projectStats) {
+        const container = this.elements.analyticsResults || this.elements.results;
+        if (!container || !projectStats || projectStats.length === 0) {
+            return;
+        }
+
+        const projectsHtml = projectStats.map(proj => `
+            <div class="bg-navy/5 border-2 border-navy/10 p-4 rounded mb-3">
+                <div class="flex justify-between items-start mb-2">
+                    <h4 class="font-headline font-bold text-navy">
+                        ${proj.projectName}
+                    </h4>
+                    <span class="text-xs bg-amber/20 text-amber-900 px-2 py-1 rounded border border-amber-300">
+                        ${proj.sessionCount} sessions
+                    </span>
+                </div>
+                <p class="text-sm text-navy/60">
+                    Primary focus: <span class="font-bold">${proj.topErrorType}</span> 
+                    (${proj.topErrorPercentage}%)
+                </p>
+            </div>
+        `).join('');
+
+        const html = `
+            <div class="border-3 border-navy/20 bg-white p-6 mb-8">
+                <h3 class="font-headline font-bold text-navy text-xl mb-4 uppercase">
+                    Cross-Project Learning
+                </h3>
+                <p class="text-sm text-navy/60 mb-6">
+                    You're applying lessons across ${projectStats.length} project${projectStats.length !== 1 ? 's' : ''}
+                </p>
+                ${projectsHtml}
+                
+                ${projectStats.length > 1 ? `
+                    <div class="bg-blue-50 border-2 border-blue-300 p-4 rounded mt-4">
+                        <p class="text-sm text-blue-800">
+                            <span class="font-bold">💡 Transferable Skills:</span>
+                            You're building expertise that applies across different projects.
+                            This is real learning in action!
+                        </p>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+
+        container.insertAdjacentHTML('beforeend', html);
+    },
+
+    /**
+     * Display knowledge base table
+     * @param {Array} knowledge - Principles with metrics
+     */
+    displayKnowledgeBase(knowledge) {
+        const container = this.elements.analyticsResults || this.elements.results;
+        if (!container || !knowledge || knowledge.length === 0) {
+            return;
+        }
+
+        // Top 10 by success rate
+        const topKnowledge = knowledge.slice(0, 10);
+
+        const rowsHtml = topKnowledge.map(item => `
+            <tr class="border-b border-navy/10 hover:bg-navy/5">
+                <td class="py-3 px-4 text-sm text-navy">
+                    ${item.principle}
+                </td>
+                <td class="py-3 px-4 text-center">
+                    <span class="inline-block px-2 py-1 rounded text-xs font-bold
+                        ${item.successRate >= 80 ? 'bg-green-100 text-green-800' :
+                item.successRate >= 60 ? 'bg-yellow-100 text-yellow-800' :
+                    'bg-red-100 text-red-800'}">
+                        ${item.successRate}%
+                    </span>
+                </td>
+                <td class="py-3 px-4 text-center text-sm text-navy/60">
+                    ${item.appliedCount}
+                </td>
+                <td class="py-3 px-4 text-xs text-navy/50">
+                    ${item.fromProject}
+                </td>
+            </tr>
+        `).join('');
+
+        const html = `
+            <div class="border-3 border-navy/20 bg-white p-6 mb-8">
+                <h3 class="font-headline font-bold text-navy text-xl mb-4 uppercase">
+                    Your Knowledge Base
+                </h3>
+                <p class="text-sm text-navy/60 mb-6">
+                    Top ${topKnowledge.length} principles by success rate
+                </p>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b-2 border-navy/20 bg-navy/5">
+                                <th class="py-2 px-4 text-left text-xs font-headline font-bold text-navy uppercase">
+                                    Principle
+                                </th>
+                                <th class="py-2 px-4 text-center text-xs font-headline font-bold text-navy uppercase">
+                                    Success
+                                </th>
+                                <th class="py-2 px-4 text-center text-xs font-headline font-bold text-navy uppercase">
+                                    Uses
+                                </th>
+                                <th class="py-2 px-4 text-left text-xs font-headline font-bold text-navy uppercase">
+                                    Project
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHtml}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+
+        container.insertAdjacentHTML('beforeend', html);
+    },
 };
 
 // Export for usage in app.js
