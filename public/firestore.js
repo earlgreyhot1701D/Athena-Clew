@@ -208,6 +208,43 @@ const FirestoreOps = {
     },
 
     /**
+     * Get ALL principles across all categories (for analytics)
+     * Bypasses orderBy constraint by sorting in memory
+     * @param {string} sessionId 
+     * @param {string} projectId 
+     * @param {number} limit 
+     * @returns {Promise<Array>} ALL principles sorted by success rate
+     */
+    async getAllPrinciples(sessionId, projectId, limit = 999) {
+        try {
+            const snapshot = await db.collection('sessions')
+                .doc(sessionId)
+                .collection('projects')
+                .doc(projectId)
+                .collection('principles')
+                .limit(limit)
+                .get();
+
+            const principles = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+
+            // Sort in JavaScript by successRate (descending)
+            const sorted = principles.sort((a, b) =>
+                (b.context?.successRate || 0) - (a.context?.successRate || 0)
+            );
+
+            console.log(`✅ Retrieved ${sorted.length} principles across all categories`);
+            return sorted;
+
+        } catch (error) {
+            console.error('Get all principles failed:', error);
+            return [];
+        }
+    },
+
+    /**
      * Feedback loop: Update principle success rate
      * @param {string} sessionId 
      * @param {string} projectId 

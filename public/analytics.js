@@ -26,7 +26,7 @@ const Analytics = {
             for (const project of allProjects) {
                 const fixes = await window.FirestoreOps.getAllFixesForProject(sessionId, project.id);
                 // Get ALL principles (category=null, high limit)
-                const principles = await window.FirestoreOps.queryPrinciples(sessionId, project.id, null, 999);
+                const principles = await window.FirestoreOps.getAllPrinciples(sessionId, project.id, 999);
 
                 allFixes = allFixes.concat(fixes);
                 allPrinciples = allPrinciples.concat(principles);
@@ -185,7 +185,7 @@ const Analytics = {
 
             for (const project of allProjects) {
                 // Get ALL principles (category=null, high limit)
-                const principles = await window.FirestoreOps.queryPrinciples(sessionId, project.id, null, 999);
+                const principles = await window.FirestoreOps.getAllPrinciples(sessionId, project.id, 999);
 
                 // Tag with project name for context
                 const tagged = principles.map(p => ({
