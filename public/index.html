@@ -479,8 +479,11 @@
 
             async handleSwitch(projectId) {
                 const sessionId = localStorage.getItem('athena_session_id');
+                const select = document.getElementById('project-select');
+                const projectName = select.options[select.selectedIndex]?.text || projectId; // Fallback to ID
+
                 await window.Projects.setCurrent(sessionId, projectId);
-                window.ui && window.ui.showSuccess(`Switched to ${projectId}`);
+                window.ui && window.ui.showSuccess(`Switched to "${projectName}"`);
                 // Clear results when switching projects
                 const results = document.getElementById('results');
                 if (results) results.innerHTML = '';
@@ -516,16 +519,17 @@
             async deleteProject() {
                 const select = document.getElementById('project-select');
                 const projectId = select.value;
+                const projectName = select.options[select.selectedIndex]?.text || projectId;
                 if (!projectId) return;
 
-                if (!confirm(`Are you sure you want to delete "${projectId}"? This cannot be undone.`)) {
+                if (!confirm(`Are you sure you want to delete "${projectName}"? This cannot be undone.`)) {
                     return;
                 }
 
                 try {
                     const sessionId = localStorage.getItem('athena_session_id');
                     await window.Projects.delete(sessionId, projectId);
-                    window.ui && window.ui.showSuccess(`Deleted "${projectId}"`);
+                    window.ui && window.ui.showSuccess(`Deleted "${projectName}"`);
                     await this.refreshProjectList(sessionId);
                 } catch (error) {
                     window.ui && window.ui.showError(error.message);
@@ -534,10 +538,11 @@
         };
 
         // Initialize when session is ready
-        document.addEventListener('DOMContentLoaded', async () => {
-            const sessionId = await getOrCreateSession(); // From session.js
-            await window.ProjectUI.init(sessionId);
-        });
+        // REMOVED DUPLICATE INIT: app.js handles this centrally to prevent race conditions
+        // document.addEventListener('DOMContentLoaded', async () => {
+        //     const sessionId = await getOrCreateSession(); // From session.js
+        //     await window.ProjectUI.init(sessionId);
+        // });
     </script>
     <!-- Pending: gemini.js, firestore.js, app.js -->
 
