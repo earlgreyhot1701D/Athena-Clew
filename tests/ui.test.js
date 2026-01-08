@@ -30,26 +30,6 @@ const createMockElement = (id) => {
     return elementStore[id];
 };
 
-global.document = {
-    getElementById: jest.fn((id) => createMockElement(id)),
-    createElement: jest.fn((tag) => ({
-        tag,
-        className: '',
-        textContent: '',
-        remove: jest.fn(),
-        style: {} // in case
-    })),
-    body: {
-        appendChild: jest.fn(),
-        contains: jest.fn()
-    },
-    addEventListener: jest.fn((event, cb) => {
-        if (event === 'DOMContentLoaded') cb();
-    }),
-};
-
-global.window = {};
-
 // Reset store helper
 const resetStore = () => {
     for (const key in elementStore) delete elementStore[key];
@@ -58,17 +38,34 @@ const resetStore = () => {
     createMockElement('get-help-btn');
     createMockElement('results');
     createMockElement('theseus-demo');
+    createMockElement('analytics-results'); // Added missing element
 };
 
 // --- Require Module Under Test ---
-// Must be after global.document is set
 const ui = require('../public/ui');
 
 describe('UI Logic', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         resetStore();
+
+        // Spy on document methods instead of overwriting global.document
+        jest.spyOn(document, 'getElementById').mockImplementation((id) => createMockElement(id));
+        jest.spyOn(document, 'createElement').mockImplementation((tag) => ({
+            tag,
+            className: '',
+            textContent: '',
+            remove: jest.fn(),
+            style: {}
+        }));
+        // Note: document.body is available in JSDOM, can spy on appendChild if needed
+        jest.spyOn(document.body, 'appendChild').mockImplementation(jest.fn());
+
         window.ui.init(); // Re-bind elements
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
     });
 
     test('init captures elements', () => {

@@ -4,8 +4,8 @@
     "test:e2e": "playwright test"
   },
   "devDependencies": {
-    "@playwright/test": "latest",
-    "jest": "latest",
-    "jest-environment-jsdom": "^30.2.0"
+    "@playwright/test": "^1.45.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
   }
 }

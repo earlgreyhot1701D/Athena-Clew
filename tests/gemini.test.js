@@ -8,20 +8,26 @@ const mockGenerateContent = jest.fn();
 const mockModel = {
     generateContent: mockGenerateContent
 };
-global.window = {
-    getGenerativeModel: jest.fn(() => mockModel)
-};
+
+// Ensure window exists (JSDOM provides it) and mock the function
+Object.defineProperty(window, 'GeminiModel', {
+    value: mockModel,
+    writable: true
+});
 
 const { Gemini } = require('../public/gemini');
 
 describe('Gemini AI Integration', () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        // Reset the mock implementation if needed
+        window.GeminiModel = mockModel;
+        Gemini.model = null; // Reset internal state
     });
 
-    test('init calls getGenerativeModel', () => {
+    test('init connects to window.GeminiModel', () => {
         Gemini.init();
-        expect(global.window.getGenerativeModel).toHaveBeenCalled();
+        expect(Gemini.model).toBe(mockModel);
     });
 
     test('analyzeError returns valid analysis from JSON response', async () => {
@@ -82,6 +88,6 @@ describe('Gemini AI Integration', () => {
 
         const ranked = await Gemini.rankSolutionsBySemantic(principles, error);
 
-        expect(ranked[0].id).toBe(2); // Should be first (cat match + keyword + high success)
+        expect(ranked[0].principleId).toBe(2); // Should be first (cat match + keyword + high success)
     });
 });
