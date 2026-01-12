@@ -1,0 +1,12 @@
+node_modules
+.git
+.gitignore
+.env
+.env.example
+tests
+jest.config.js
+*.md
+.DS_Store
+Dockerfile
+docker-compose.yml
+.dockerignore

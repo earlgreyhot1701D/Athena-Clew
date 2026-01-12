@@ -1,11 +1,18 @@
 {
   "scripts": {
     "test": "jest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "start": "http-server public -p 8080"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.45.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0"
+  },
+  "dependencies": {
+    "http-server": "^14.1.1"
   }
 }
