@@ -142,3 +142,18 @@ global.window.PersonalInsights = {
     detectSimilarError: jest.fn().mockResolvedValue(null)
 };
 global.PersonalInsights = global.window.PersonalInsights;
+
+global.window.Logger = {
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+    debug: jest.fn(),
+    scrub: jest.fn(val => val)
+};
+global.Logger = global.window.Logger;
+
+global.window.ErrorHandler = {
+    handle: jest.fn(),
+    asyncWrapper: (fn) => fn
+};
+global.ErrorHandler = global.window.ErrorHandler;

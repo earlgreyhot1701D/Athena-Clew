@@ -29,7 +29,7 @@ const App = {
             if (window.Gemini && window.GeminiModel) {
                 window.Gemini.init();
             } else {
-                console.log('ℹ️ Skipping Gemini init - SDK not loaded');
+                Logger.info('ℹ️ Skipping Gemini init - SDK not loaded');
             }
 
             // Get session
@@ -57,10 +57,9 @@ const App = {
                 });
             });
 
-            console.log('✅ App initialized');
+            Logger.info('✅ App initialized');
         } catch (error) {
-            console.error('App initialization failed:', error);
-            window.ui && window.ui.showError('Initialization failed: ' + error.message);
+            ErrorHandler.handle(error, 'App.init');
         }
     },
 
@@ -116,59 +115,34 @@ const App = {
 
         try {
             this.isProcessing = true;
-            window.ui.setButtonState(false); // Set loading state
-            window.ui.clearResults(); // Clear previous results
+            window.ui.setButtonState(false);
+            window.ui.clearResults();
 
-            // STEP 0: Verify project context
             console.log(`🚀 Starting pipeline for project: ${projectId}`);
 
             // NEW: Check for personal patterns
             try {
                 const patterns = await window.PersonalInsights.analyzeUserPatterns(sessionId, projectId);
-
                 if (patterns) {
-                    // Show personal insights before analysis
-                    // Note: We don't have analysis.classification yet, so we pass 'unknown' or try to guess?
-                    // The prompt asked for `analysis?.classification || 'unknown'`, but `analysis` isn't defined yet.
-                    // However, we can update the alert later or just pass 'unknown' for now.
-                    // Wait, the prompt says: `window.ui.displayPersonalInsights(patterns, analysis?.classification || 'unknown');`
-                    // But `analysis` is defined in Step 1.
-                    // Let's pass 'unknown' for the initial display since we haven't analyzed it yet.
-                    // OR better, we can delay the DISPLAY until we have the classification?
-                    // The prompt says "ADD this code BEFORE Step 1".
-                    // If I look at the prompt, it uses `analysis?.classification`. But analysis is defined... AFTER this block.
-                    // Ah, looking at the code I replaced: `let analysis;` is declared later.
-                    // I will check if I can quick-classify or just pass 'unknown' as a safe default.
                     window.ui.displayPersonalInsights(patterns, 'unknown');
                 }
             } catch (error) {
-                console.log('⏭️ Personal insights unavailable:', error.message);
-                // Non-critical, continue without insights
+                Logger.info('⏭️ Personal insights unavailable:', error.message);
             }
 
-            // NEW: Check for déjà vu (similar past error)
+            // NEW: Check for déjà vu
             if (!this.skipDejavu) {
                 try {
-                    const similarFix = await window.PersonalInsights.detectSimilarError(
-                        errorInput,
-                        sessionId
-                    );
-
+                    const similarFix = await window.PersonalInsights.detectSimilarError(errorInput, sessionId);
                     if (similarFix) {
-                        // Show déjà vu alert
                         window.ui.displayDejavu(similarFix, errorInput);
-
-                        // Store for "Use This Fix" button
                         this.currentDejavu = similarFix;
-
-                        // Wait for user decision: Use fix or continue
-                        this.isProcessing = false; // Reset processing flag so buttons work
+                        this.isProcessing = false;
                         window.ui.setButtonState(true);
-                        return; // Don't proceed to Step 1 yet
+                        return;
                     }
                 } catch (error) {
-                    console.log('⏭️ Déjà vu check unavailable:', error.message);
-                    // Non-critical, continue
+                    Logger.info('⏭️ Déjà vu check unavailable:', error.message);
                 }
             }
 
@@ -178,15 +152,13 @@ const App = {
             try {
                 analysis = await window.Gemini.analyzeError({
                     message: errorInput,
-                    stack: '' // Multiline stack extraction is future work
+                    stack: ''
                 });
             } catch (error) {
-                console.warn('⚠️ Step 1 Gemini failed, using fallback classification:', error.message);
-
-                // Graceful degradation: Continue with fallback
+                console.warn('⚠️ Step 1 Gemini failed, using fallback:', error.message);
                 analysis = {
                     classification: 'unknown',
-                    rootCause: 'AI analysis unavailable (rate limit or network error). Using fallback classification.',
+                    rootCause: 'AI analysis unavailable. Using fallback.',
                     confidence: 0.3,
                     patterns: [],
                     responseTime: 0,
@@ -195,131 +167,78 @@ const App = {
                 };
             }
             window.ui.displayAnalysis(analysis);
-            console.log('✅ Step 1 complete:', analysis);
+            Logger.info('✅ Step 1 complete:', analysis);
 
             // STEP 2: Search Past Fixes
             window.ui.showStepProgress(2, 'Searching past fixes...');
-            const pastFixes = await window.FirestoreOps.searchPastFixes(
-                sessionId,
-                projectId,
-                analysis.classification
-            );
+            const pastFixes = await window.FirestoreOps.searchPastFixes(sessionId, projectId, analysis.classification);
 
-            // Cold Start Handling: Try Cross-Project Search
             if (pastFixes.length === 0) {
-                console.log('ℹ️ No local fixes. Searching across all projects...');
                 try {
-                    const globalFixes = await window.FirestoreOps.searchAcrossAllProjects(
-                        sessionId,
-                        analysis.classification
-                    );
-
+                    const globalFixes = await window.FirestoreOps.searchAcrossAllProjects(sessionId, analysis.classification);
                     if (globalFixes.length > 0) {
                         pastFixes.push(...globalFixes);
-                        console.log(`✅ Found ${globalFixes.length} fixes from other projects!`);
                         window.ui.showStepProgress(2, 'Found solutions from your other projects!');
-                    } else {
-                        console.log('ℹ️ Cold Start: No past fixes found globally.');
                     }
                 } catch (err) {
                     console.warn('Cross-project search failed:', err);
                 }
             }
             window.ui.displayPastFixes(pastFixes);
-            console.log(`✅ Step 2 complete: Found ${pastFixes.length} past fixes`);
+            Logger.info(`✅ Step 2 complete: Found ${pastFixes.length} past fixes`);
 
-            // STEP 3: Extract Principle (if past fixes exist)
+            // STEP 3: Extract Principle
             let principle = null;
             if (pastFixes.length > 0) {
                 window.ui.showStepProgress(3, 'Extracting principle...');
                 try {
-                    principle = await window.Gemini.extractPrinciple(
-                        { message: errorInput },
-                        pastFixes[0].fix,
-                        analysis
-                    );
+                    principle = await window.Gemini.extractPrinciple({ message: errorInput }, pastFixes[0].fix, analysis);
                     window.ui.displayPrinciple(principle);
-                    console.log('✅ Step 3 complete:', principle);
+                    Logger.info('✅ Step 3 complete:', principle);
                 } catch (error) {
-                    console.warn('⚠️ Step 3 Gemini failed, continuing without principle:', error.message);
-
-                    // Graceful degradation: Continue without principle (non-critical)
                     const progressDiv = document.getElementById('step-progress');
-                    if (progressDiv) {
-                        progressDiv.innerHTML += ` <span class="text-xs text-amber-600">(Principle extraction unavailable - continuing)</span>`;
-                    }
+                    if (progressDiv) progressDiv.innerHTML += ` <span class="text-xs text-amber-600">(Principle extraction unavailable)</span>`;
                 }
             } else {
-                // UI update specific for cold start
                 const progressDiv = document.getElementById('step-progress');
                 if (progressDiv) progressDiv.innerHTML += ` <span class="text-xs text-navy/50">(Skipped: No history)</span>`;
-                console.log('⏭️  Step 3 skipped: Cold Start');
+                Logger.info('⏭️ Step 3 skipped: Cold Start');
             }
 
             // STEP 4: Query & Rank Solutions
             window.ui.showStepProgress(4, 'Ranking solutions...');
-            const principles = await window.FirestoreOps.queryPrinciples(
-                sessionId,
-                projectId,
-                analysis.classification
-            );
+            const principles = await window.FirestoreOps.queryPrinciples(sessionId, projectId, analysis.classification);
 
             let ranked = [];
             if (principles.length > 0) {
-                ranked = await window.Gemini.rankSolutionsBySemantic(
-                    principles,
-                    { message: errorInput, classification: analysis.classification }
-                );
-            } else {
-                console.log('ℹ️ Cold Start: No principles to rank yet.');
+                ranked = await window.Gemini.rankSolutionsBySemantic(principles, { message: errorInput, classification: analysis.classification });
             }
 
             window.ui.displaySolutions(ranked);
-            console.log(`✅ Step 4 complete: ${ranked.length} solutions ranked`);
+            Logger.info(`✅ Step 4 complete: ${ranked.length} solutions ranked`);
 
-            // STEP 5: Ready for feedback (store on user click)
+            // STEP 5: Ready for feedback
             this.currentFix = {
                 error: { message: errorInput, stack: '' },
-                fix: ranked.length > 0 ? { solution: ranked[0].solution } : null, // If null, we'll store a generic or ask user
+                fix: ranked.length > 0 ? { solution: ranked[0].solution } : null,
                 analysis,
                 principle
             };
 
             window.ui.showFeedbackButtons();
-
-            const readyMsg = ranked.length > 0
-                ? 'Ready for your feedback!'
-                : 'First occurrence! Fix it, then click "This Helped" to learn.';
+            const readyMsg = ranked.length > 0 ? 'Ready for your feedback!' : 'First occurrence! Fix it, then click "This Helped".';
             window.ui.showStepProgress(5, readyMsg);
 
         } catch (error) {
-            console.error('Pipeline failed:', error);
-
-            // Better error messages for common issues
-            if (error.message.includes('429') ||
-                error.message.includes('quota') ||
-                error.message.includes('rate limit')) {
-                window.ui.showError(
-                    '⏰ Gemini API rate limit reached (20 requests/day on free tier). ' +
-                    'Quota resets daily. Pattern-based classification is working as fallback!'
-                );
-            } else if (error.message.includes('AI/fetch-error') ||
-                error.message.includes('network')) {
-                window.ui.showError(
-                    '🌐 AI service temporarily unavailable. ' +
-                    'Using pattern-based fallback classification.'
-                );
-            } else if (error.message.includes('No project selected')) {
-                window.ui.showError(
-                    '⚠️ Please create or select a project first using the dropdown above.'
-                );
+            if (error.message && (error.message.includes('429') || error.message.includes('quota'))) {
+                window.ui.showError('⏰ Gemini API rate limit reached. Using fallback patterns.');
+                Logger.warn('Gemini Rate Limit', error);
             } else {
-                // Fallback: show original error
-                window.ui.showError(`Pipeline failed: ${error.message}`);
+                ErrorHandler.handle(error, 'Pipeline');
             }
         } finally {
             this.isProcessing = false;
-            window.ui.setButtonState(true); // Reset button
+            window.ui.setButtonState(true);
         }
     },
 
