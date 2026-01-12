@@ -125,3 +125,20 @@ global.localStorage = localStorageMock;
 
 // Mock Console (to keep test output clean, optional)
 // global.console = { ...console, log: jest.fn(), warn: jest.fn(), error: jest.fn() };
+
+// Mock Refactored Modules
+global.window.ErrorClassifier = {
+    classify: jest.fn().mockReturnValue('logic')
+};
+global.ErrorClassifier = global.window.ErrorClassifier;
+
+global.window.AnalyticsView = {
+    render: jest.fn().mockResolvedValue()
+};
+global.AnalyticsView = global.window.AnalyticsView;
+
+global.window.PersonalInsights = {
+    analyzeUserPatterns: jest.fn().mockResolvedValue([]),
+    detectSimilarError: jest.fn().mockResolvedValue(null)
+};
+global.PersonalInsights = global.window.PersonalInsights;
