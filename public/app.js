@@ -382,9 +382,6 @@ const App = {
         }
 
         try {
-            // Show the past solution
-            window.ui.displayPastFixSolution(this.currentDejavu);
-
             // Reconstruct analysis object from stored data to satisfy storeFix() requirements
             const reconstructedAnalysis = {
                 classification: this.currentDejavu.error?.type || 'unknown',
@@ -393,16 +390,17 @@ const App = {
                 responseTime: this.currentDejavu.geminiThinking?.responseTime || 0
             };
 
-            // Skip to Step 5 (feedback)
+            // Set current fix context
             this.currentFix = {
                 error: { message: this.currentDejavu.error.message },
                 fix: this.currentDejavu.fix,
-                analysis: reconstructedAnalysis, // Use valid object
+                analysis: reconstructedAnalysis,
                 principle: this.currentDejavu.principle
             };
 
-            window.ui.showFeedbackButtons();
-            window.ui.showStepProgress(5, 'Used past fix - was it helpful?');
+            // Auto-save: Immediate feedback loop
+            // We skip showing the solution again because the user just saw it in the popup
+            await this.handleHelpfulFeedback();
 
         } catch (error) {
             console.error('Use past fix failed:', error);
