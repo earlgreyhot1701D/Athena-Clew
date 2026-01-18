@@ -92,7 +92,7 @@ const FirestoreOps = {
      * @param {object} analysis 
      * @returns {Promise<string>} fixId
      */
-    async storeFix(sessionId, projectId, errorData, fixData, analysis) {
+    async storeFix(sessionId, projectId, errorData, fixData, analysis, metadata = null) {
         try {
             const fixRef = db.collection('sessions')
                 .doc(sessionId)
@@ -101,7 +101,7 @@ const FirestoreOps = {
                 .collection('fixes')
                 .doc();
 
-            await fixRef.set({
+            const docData = {
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                 error: {
                     message: errorData.message,
@@ -119,11 +119,17 @@ const FirestoreOps = {
                 },
                 userFeedback: null,
                 linkedPrinciples: []
-            });
+            };
+
+            // Add optional metadata (e.g. cross-project origin)
+            if (metadata) {
+                docData.metadata = metadata;
+            }
+
+            await fixRef.set(docData);
 
             console.log(`✅ Fix stored: ${fixRef.id}`);
             return fixRef.id;
-
         } catch (error) {
             console.error('Store fix failed:', error);
             throw error;
@@ -310,7 +316,8 @@ const FirestoreOps = {
 
             await fixRef.update({
                 timesApplied: currentApplied + 1,
-                lastAppliedAt: firebase.firestore.FieldValue.serverTimestamp()
+                lastAppliedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                timestamp: firebase.firestore.FieldValue.serverTimestamp() // Bump to top of history
             });
 
             console.log(`✅ Updated fix metrics: ${fixId} (Applied ${currentApplied + 1} times)`);

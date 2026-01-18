@@ -275,10 +275,7 @@ const App = {
         try {
             window.ui.setButtonState(false);
 
-            // Pattern-based classification fallback
-            // Pattern-based classification now handled by ErrorClassifier (utils/classifier.js)
-
-            // Build better error data (include type from analysis)
+            // Build better error data
             const errorData = {
                 message: this.currentFix.error.message,
                 stack: this.currentFix.error.stack || '',
@@ -288,68 +285,105 @@ const App = {
                 ) : 'unknown'
             };
 
-            // Build better fix data (use root cause if no explicit fix)
+            // Build better fix data
             const fixData = this.currentFix.fix ? this.currentFix.fix : {
-                solution: this.currentFix.analysis?.rootCause
-                    ? `Root cause: ${this.currentFix.analysis.rootCause}. Resolved by user.`
-                    : 'Manual fix applied by user',
+                solution: this.currentFix.analysis?.rootCause || 'Manual fix',
                 explanation: this.currentFix.analysis?.rootCause || 'User resolved this error manually'
             };
 
-            // Store fix with better data
-            // Store fix with better data (or update if re-application)
             let fixId;
 
-            if (this.currentFix.isReapplication && this.currentFix.originalFixId) {
-                // UPDATE existing fix
-                console.log(`🔄 Updating partial fix ${this.currentFix.originalFixId} metrics...`);
-                fixId = await window.FirestoreOps.updateFixMetrics(
-                    sessionId,
-                    projectId,
-                    this.currentFix.originalFixId
-                );
-            } else {
-                // CREATE new fix
+            let updateSuccess = false;
+
+            // 1. Try to UPDATE existing fix (Strictly Same Project Only)
+            if (this.currentFix.isReapplication &&
+                this.currentFix.originalFixId &&
+                this.currentFix.fromProjectId === projectId) {
+
+                try {
+                    console.log(`🔄 Attempting to update same-project fix ${this.currentFix.originalFixId}...`);
+                    const updatedId = await window.FirestoreOps.updateFixMetrics(
+                        sessionId,
+                        projectId,
+                        this.currentFix.originalFixId
+                    );
+
+                    if (updatedId) {
+                        fixId = updatedId;
+                        updateSuccess = true;
+                        console.log(`✅ Update successful for ${fixId}`);
+                    } else {
+                        console.warn('⚠️ Update returned null (doc likely missing). Falling back to create.');
+                    }
+                } catch (updateErr) {
+                    console.error('⚠️ Update failed with error:', updateErr);
+                }
+            }
+
+            // 2. If Update didn't happen (Cross-Project OR New Fix OR Update Failed), CREATE it
+            if (!updateSuccess) {
+                let metadata = null;
+
+                // If it came from another project, tag it
+                if (this.currentFix.fromProjectId && this.currentFix.fromProjectId !== projectId) {
+                    console.log(`🔄 Importing solution from project ${this.currentFix.fromProjectId}`);
+                    metadata = {
+                        importedFromProjectId: this.currentFix.fromProjectId,
+                        importedAt: new Date().toISOString()
+                    };
+                }
+
+                console.log('📝 Creating new fix record...');
                 fixId = await window.FirestoreOps.storeFix(
                     sessionId,
                     projectId,
                     errorData,
                     fixData,
-                    this.currentFix.analysis
+                    this.currentFix.analysis,
+                    metadata
                 );
             }
 
             console.log(`✅ Fix stored: ${fixId}`);
 
-            // NEW: If we didn't extract a principle earlier (e.g. Cold Start), do it now!
-            if (!this.currentFix.principle && window.Gemini) {
-                try {
-                    console.log('🎓 Extracting principle from new fix...');
-                    const newPrinciple = await window.Gemini.extractPrinciple(
-                        { message: errorData.message },
-                        fixData,
-                        this.currentFix.analysis
-                    );
-                    if (newPrinciple) {
-                        this.currentFix.principle = newPrinciple;
+            if (fixId) {
+                // 3. Extract Principle (if needed) - ONLY if we have a valid fixId
+                if (!this.currentFix.principle && window.Gemini) {
+                    try {
+                        console.log('🎓 Extracting principle from new fix...');
+                        const newPrinciple = await window.Gemini.extractPrinciple(
+                            { message: errorData.message },
+                            fixData,
+                            this.currentFix.analysis
+                        );
+                        if (newPrinciple) {
+                            this.currentFix.principle = newPrinciple;
+                        }
+                    } catch (err) {
+                        console.warn('Could not extract principle on-the-fly:', err);
                     }
-                } catch (err) {
-                    console.warn('Could not extract principle on-the-fly:', err);
                 }
-            }
 
-            // Store principle (if extracted)
-            if (this.currentFix.principle) {
-                const principleId = await window.FirestoreOps.storePrinciple(
-                    sessionId,
-                    projectId,
-                    this.currentFix.principle,
-                    fixId
-                );
-                console.log(`✅ Principle stored: ${principleId}`);
-                window.ui.showSuccess('Principle learned! 🎓');
+                // 4. Store Principle - ONLY if we have a valid fixId
+                if (this.currentFix.principle) {
+                    try {
+                        const principleId = await window.FirestoreOps.storePrinciple(
+                            sessionId,
+                            projectId,
+                            this.currentFix.principle,
+                            fixId
+                        );
+                        console.log(`✅ Principle stored: ${principleId}`);
+                        window.ui.showSuccess('Principle learned! 🎓');
+                    } catch (err) {
+                        console.error('Principle storage failed:', err);
+                        window.ui.showSuccess('Fix saved! (Principle storage failed)');
+                    }
+                } else {
+                    window.ui.showSuccess('Fix saved! (No principle extracted)');
+                }
             } else {
-                window.ui.showSuccess('Fix saved! (No principle extracted)');
+                throw new Error('Failed to obtain a valid ID for the fix.');
             }
 
             // Clear form
@@ -412,6 +446,7 @@ const App = {
                 analysis: reconstructedAnalysis,
                 principle: this.currentDejavu.principle,
                 originalFixId: this.currentDejavu.id, // Track ID for deduplication
+                fromProjectId: this.currentDejavu.fromProjectId, // Track origin project
                 isReapplication: true
             };
             console.log('🔍 Trace: this.currentFix set. Calling handleHelpfulFeedback...');
