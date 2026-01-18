@@ -217,6 +217,21 @@ const App = {
             window.ui.displaySolutions(ranked);
             Logger.info(`✅ Step 4 complete: ${ranked.length} solutions ranked`);
 
+            // FALLBACK: If no principles found, usage past fixes as solutions
+            if (ranked.length === 0 && pastFixes.length > 0) {
+                console.log('ℹ️ No principles found, promoting past fixes to solutions');
+                ranked = pastFixes.map(pf => ({
+                    solution: pf.fix.solution,
+                    confidence: 0.85, // High confidence for exact matches
+                    source: pf.projectName ? `Project: ${pf.projectName}` : 'Past Fix',
+                    category: pf.error?.type || 'unknown',
+                    // context for feedback loop
+                    principleId: pf.linkedPrinciples?.[0] || null
+                }));
+                // Re-display with new data
+                window.ui.displaySolutions(ranked);
+            }
+
             // STEP 5: Ready for feedback
             this.currentFix = {
                 error: { message: errorInput, stack: '' },
