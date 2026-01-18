@@ -145,7 +145,7 @@ const PersonalInsights = {
                     fix.error.message.toLowerCase()
                 );
 
-                if (similarity > 0.7) { // 70% similar threshold
+                if (similarity > 0.4) { // 40% similar threshold (Lowered for better recall)
                     similarFixes.push({
                         ...fix,
                         similarity
