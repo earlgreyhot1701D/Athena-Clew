@@ -4,10 +4,6 @@ FROM node:18-alpine
 # Set working directory
 WORKDIR /app
 
-# Create non-root user for security
-RUN addgroup -g 1000 appuser && \
-    adduser -D -u 1000 -G appuser appuser
-
 # Copy package files
 COPY package*.json ./
 
@@ -17,11 +13,11 @@ RUN npm ci --only=production
 # Copy application code
 COPY . .
 
-# Change ownership to non-root user
-RUN chown -R appuser:appuser /app
+# Change ownership to the 'node' user (UID 1000) which exists by default in this image
+RUN chown -R node:node /app
 
-# Switch to non-root user
-USER appuser
+# Switch to non-root 'node' user
+USER node
 
 # Expose port
 EXPOSE 8080
