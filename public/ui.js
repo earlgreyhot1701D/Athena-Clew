@@ -338,12 +338,12 @@ const UI = {
                         
                         <div class="flex gap-3 mt-4">
                             <button 
-                                onclick="window.app.handleUsePastFix()"
+                                id="btn-apply-fix"
                                 class="flex-1 bg-green-600 hover:bg-green-700 text-white font-headline font-bold py-3 px-4 border-3 border-green-700 transition">
                                 ✅ Apply This Solution
                             </button>
                             <button 
-                                onclick="window.app.handleContinueAnalysis()"
+                                id="btn-try-another"
                                 class="flex-1 bg-white hover:bg-gray-50 text-navy font-headline font-bold py-3 px-4 border-3 border-navy/20 transition">
                                 🔍 Try a Different Approach
                             </button>
@@ -359,6 +359,32 @@ const UI = {
         `;
 
         this.elements.results.innerHTML = html;
+
+        // Attach event listeners via JS (More robust than inline onclick)
+        const applyBtn = document.getElementById('btn-apply-fix');
+        console.log('🔍 Trace: Looking for apply button:', applyBtn);
+
+        if (applyBtn) {
+            applyBtn.onclick = () => {
+                console.log('🔘 BUTTON CLICKED (via Listener)');
+                if (window.app && window.app.handleUsePastFix) {
+                    window.app.handleUsePastFix();
+                } else {
+                    console.error('❌ window.app.handleUsePastFix not found');
+                }
+            };
+        } else {
+            console.error('❌ Trace: Apply button NOT found in DOM!');
+        }
+
+        const tryBtn = document.getElementById('btn-try-another');
+        if (tryBtn) {
+            tryBtn.onclick = () => {
+                if (window.app && window.app.handleContinueAnalysis) {
+                    window.app.handleContinueAnalysis();
+                }
+            };
+        }
     },
 
     /**

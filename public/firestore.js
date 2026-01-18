@@ -285,6 +285,44 @@ const FirestoreOps = {
     },
 
     /**
+     * Update usage metrics for an existing fix (Deduplication)
+     * @param {string} sessionId
+     * @param {string} projectId
+     * @param {string} fixId
+     */
+    async updateFixMetrics(sessionId, projectId, fixId) {
+        try {
+            const fixRef = db.collection('sessions')
+                .doc(sessionId)
+                .collection('projects')
+                .doc(projectId)
+                .collection('fixes')
+                .doc(fixId);
+
+            const doc = await fixRef.get();
+            if (!doc.exists) {
+                console.warn(`Fix ${fixId} not found for update`);
+                return;
+            }
+
+            const data = doc.data();
+            const currentApplied = data.timesApplied || 1;
+
+            await fixRef.update({
+                timesApplied: currentApplied + 1,
+                lastAppliedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            console.log(`✅ Updated fix metrics: ${fixId} (Applied ${currentApplied + 1} times)`);
+            return fixId;
+
+        } catch (error) {
+            console.error('Failed to update fix metrics:', error);
+            throw error;
+        }
+    },
+
+    /**
      * Get all fixes for a project (for History View)
      */
     async getAllFixesForProject(sessionId, projectId) {

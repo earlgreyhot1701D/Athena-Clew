@@ -214,9 +214,6 @@ const App = {
                 ranked = await window.Gemini.rankSolutionsBySemantic(principles, { message: errorInput, classification: analysis.classification });
             }
 
-            window.ui.displaySolutions(ranked);
-            Logger.info(`✅ Step 4 complete: ${ranked.length} solutions ranked`);
-
             // FALLBACK: If no principles found, usage past fixes as solutions
             if (ranked.length === 0 && pastFixes.length > 0) {
                 console.log('ℹ️ No principles found, promoting past fixes to solutions');
@@ -228,9 +225,11 @@ const App = {
                     // context for feedback loop
                     principleId: pf.linkedPrinciples?.[0] || null
                 }));
-                // Re-display with new data
-                window.ui.displaySolutions(ranked);
             }
+
+            // Display ONLY once after all logic
+            window.ui.displaySolutions(ranked);
+            Logger.info(`✅ Step 4 complete: ${ranked.length} solutions ranked`);
 
             // STEP 5: Ready for feedback
             this.currentFix = {
@@ -298,14 +297,27 @@ const App = {
             };
 
             // Store fix with better data
-            // Store fix with better data
-            const fixId = await window.FirestoreOps.storeFix(
-                sessionId,
-                projectId,
-                errorData,
-                fixData,
-                this.currentFix.analysis
-            );
+            // Store fix with better data (or update if re-application)
+            let fixId;
+
+            if (this.currentFix.isReapplication && this.currentFix.originalFixId) {
+                // UPDATE existing fix
+                console.log(`🔄 Updating partial fix ${this.currentFix.originalFixId} metrics...`);
+                fixId = await window.FirestoreOps.updateFixMetrics(
+                    sessionId,
+                    projectId,
+                    this.currentFix.originalFixId
+                );
+            } else {
+                // CREATE new fix
+                fixId = await window.FirestoreOps.storeFix(
+                    sessionId,
+                    projectId,
+                    errorData,
+                    fixData,
+                    this.currentFix.analysis
+                );
+            }
 
             console.log(`✅ Fix stored: ${fixId}`);
 
@@ -376,34 +388,40 @@ const App = {
     },
 
     async handleUsePastFix() {
+        console.log('🔍 Trace: handleUsePastFix started');
         if (!this.currentDejavu) {
-            window.ui.showError('No past fix available');
+            console.error('❌ Trace: No currentDejavu data found');
             return;
         }
 
         try {
             // Reconstruct analysis object from stored data to satisfy storeFix() requirements
+            console.log('🔍 Trace: Reconstructing analysis object...', this.currentDejavu);
             const reconstructedAnalysis = {
                 classification: this.currentDejavu.error?.type || 'unknown',
                 rootCause: 'Reused past solution',
                 thinkingTokens: this.currentDejavu.geminiThinking?.tokensUsed || 0,
                 responseTime: this.currentDejavu.geminiThinking?.responseTime || 0
             };
+            console.log('🔍 Trace: Reconstructed:', reconstructedAnalysis);
 
             // Set current fix context
             this.currentFix = {
                 error: { message: this.currentDejavu.error.message },
                 fix: this.currentDejavu.fix,
                 analysis: reconstructedAnalysis,
-                principle: this.currentDejavu.principle
+                principle: this.currentDejavu.principle,
+                originalFixId: this.currentDejavu.id, // Track ID for deduplication
+                isReapplication: true
             };
+            console.log('🔍 Trace: this.currentFix set. Calling handleHelpfulFeedback...');
 
             // Auto-save: Immediate feedback loop
-            // We skip showing the solution again because the user just saw it in the popup
             await this.handleHelpfulFeedback();
+            console.log('✅ Trace: handleUsePastFix completed successfully');
 
         } catch (error) {
-            console.error('Use past fix failed:', error);
+            console.error('❌ Trace: Use past fix failed:', error);
             window.ui.showError('Could not apply past fix');
         }
     },
