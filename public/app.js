@@ -385,11 +385,19 @@ const App = {
             // Show the past solution
             window.ui.displayPastFixSolution(this.currentDejavu);
 
+            // Reconstruct analysis object from stored data to satisfy storeFix() requirements
+            const reconstructedAnalysis = {
+                classification: this.currentDejavu.error?.type || 'unknown',
+                rootCause: 'Reused past solution',
+                thinkingTokens: this.currentDejavu.geminiThinking?.tokensUsed || 0,
+                responseTime: this.currentDejavu.geminiThinking?.responseTime || 0
+            };
+
             // Skip to Step 5 (feedback)
             this.currentFix = {
                 error: { message: this.currentDejavu.error.message },
                 fix: this.currentDejavu.fix,
-                analysis: this.currentDejavu.analysis,
+                analysis: reconstructedAnalysis, // Use valid object
                 principle: this.currentDejavu.principle
             };
 
