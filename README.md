@@ -122,8 +122,8 @@ Track your growth as a debugger:
 | **Theseus Clew** | 🆕 NEW | Autonomous debugging agent (Gemini 3) |
 | **[Lumen Clew](https://lumenclew.lovable.app)** | ✅ Live | Code health scanner with plain-language insights |
 | **[Metis Clew](https://metis-clew.vercel.app)** | ✅ Live | AI code explainer (WHAT, HOW, WHY) |
-| **Janus Clew** | 🏆 Coming | Repository analyzer & career guidance |
-| **Ariadne Clew** | 🔮 Coming | Chat transcript reasoning preservation |
+| **Janus Clew** | 🏆 Coming Soon | Repository analyzer & career guidance |
+| **Ariadne Clew** | 🔮 Coming Soon | Chat transcript reasoning preservation |
 
 > **🏆 Janus Clew** won **[AWS Global Vibe: AI Coding Hackathon 2025](https://dorahacks.io/hackathon/awsvibecoding/winner)** and earned a scholarship to **Draper University Cohort 2026**
 
@@ -291,7 +291,7 @@ npm run test:e2e
 
 ## 🎓 Lessons Learned
 
-### 1. Occam's Razor Wins Hackathons
+### 1. Occam's Razor 
 
 > "Simplest solution that ships bulletproof scores higher than ambitious solution that crashes."
 
@@ -340,7 +340,7 @@ Every feature started with:
 For "Learning Moment" detection, we could have used vector embeddings. Instead, we used **Jaccard Similarity** (set intersection):
 - **Embeddings**: 200ms latency, costs money, requires API call.
 - **Jaccard**: 0ms latency, free, runs on client.
-For an MVP, instant feedback loops beat "state-of-the-art" complexity every time.
+For an MVP, instant feedback loops beat "state-of-the-art" complexity.
 
 ### 5. Firebase AI Logic SDK Gotchas
 
@@ -371,18 +371,15 @@ Athena-Clew/
 │   ├── gemini.js               # Gemini 3 API integration
 │   ├── firestore.js            # Database operations
 │   ├── session.js              # Session management
-│   ├── projects.js             # Multi-project logic
+│   ├── projects.js             # Project management
 │   ├── ui.js                   # DOM manipulation
 │   ├── analytics.js            # Analytics aggregation
+│   ├── analytics-view.js       # Analytics dashboard logic
+│   ├── history.js              # History view logic
 │   ├── personal-insights.js    # Déjà vu detection + patterns
-│   ├── history.js              # History view rendering
-│   ├── analytics-view.js       # Analytics dashboard
-│   ├── firebase-config.js      # API keys (gitignored)
+│   ├── firebase-config.js      # API keys (public client ID)
 │   ├── styles.css              # Custom styles
-│   └── utils/
-│       ├── classifier.js       # Error classification fallback
-│       ├── error-handler.js    # Global error handling
-│       └── logger.js           # Logging utility
+│   └── Screenshot/             # Image assets
 │
 ├── tests/                       # Jest + Playwright tests
 │   ├── integration.test.js     # Full pipeline E2E
@@ -393,9 +390,7 @@ Athena-Clew/
 │   ├── ui.test.js
 │   └── setup.js                # Test configuration
 │
-├── docs/
-│   └── screenshot.png          # App screenshot (also in public/Screenshot/)
-│
+├── .env.example                # Example environment variables
 ├── firebase.json               # Firebase Hosting config
 ├── firestore.rules             # Security rules
 ├── firestore.indexes.json      # Database indexes
@@ -403,7 +398,7 @@ Athena-Clew/
 ├── package.json                # Dependencies
 ├── jest.config.js              # Test config
 ├── TROUBLESHOOTING.md          # Critical fixes documented
-└── README.md                   # You are here
+└── README.md                   # This file
 ```
 
 ---
