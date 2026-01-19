@@ -13,7 +13,7 @@ Most AI coding assistants treat every error like it's the first time they've see
 
 **Theseus** is an autonomous agent that **learns from your debugging sessions**.
 
-Powered by **Gemini 3 Deep Thinking**, it doesn't just patch code—it **extracts reusable principles** from your fixes and stores them in a long-term knowledge graph. When you encounter a similar error later (even in a different project), Theseus shouts **"Déjà Vu!"** and reminds you how you solved it last time.
+Powered by **Gemini 3 Deep Thinking**, it doesn't just patch code—it **extracts reusable principles** from your fixes and stores them in a long-term knowledge graph. When you encounter a similar error later (even in a different project), Theseus shouts **"Learning Moment!"** and reminds you how you solved it last time.
 
 ---
 
@@ -92,7 +92,7 @@ Every troubleshooting session is preserved in your history. You can revisit past
 
 ![Debugging History](public/Screenshot/Debugging.png)
 
-### 🔮 Déjà Vu Detection
+### 🔮 Learning Moment Detection
 When you encounter an error you've seen before—across ANY project—Theseus recognizes it instantly using Jaccard similarity matching.
 
 ![Cross Project Learning](public/Screenshot/Cross%20Project%20Learning.png)
