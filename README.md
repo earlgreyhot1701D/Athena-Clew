@@ -25,7 +25,7 @@ Powered by **Gemini 3 Deep Thinking**, it doesn't just patch code—it **extract
 
 *Paste an error. Get intelligent analysis. Watch Theseus learn.*
 
-![Athena Clew Platform Screenshot](public/Screenshot/Athena_Theseus_Screen_Shot.png)
+![Athena Clew Platform Screenshot](public/Screenshot/Athena%20Theseus%20Screen%20Shot.png)
 
 ---
 
@@ -86,8 +86,12 @@ Powered by **Gemini 3 Deep Thinking**, it doesn't just patch code—it **extract
  OUTPUT: Intelligent suggestion + Principle learned
 ```
 
+![Debugging Pipeline](public/Screenshot/Debugging.png)
+
 ### 🔮 Déjà Vu Detection
 When you encounter an error you've seen before—across ANY project—Theseus recognizes it instantly using Jaccard similarity matching.
+
+![Cross Project Learning](public/Screenshot/Cross%20Project%20Learning.png)
 
 *"You've seen this before! In your React project 3 days ago, you fixed this by..."*
 
@@ -97,6 +101,8 @@ Track your growth as a debugger:
 - **Cross-Project Learning** — Watch principles transfer between projects
 - **Knowledge Base** — Your top principles ranked by success rate
 - **Growth Metrics** — Evidence-based proof of improvement
+
+![Analytics Dashboard](public/Screenshot/Analytics.png)
 
 ### 🧩 The Clew Suite — One Platform, Five Tools
 
