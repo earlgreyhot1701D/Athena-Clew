@@ -86,7 +86,11 @@ Powered by **Gemini 3 Deep Thinking**, it doesn't just patch code—it **extract
  OUTPUT: Intelligent suggestion + Principle learned
 ```
 
-![Debugging Pipeline](public/Screenshot/Debugging.png)
+
+### 📜 Debugging History
+Every troubleshooting session is preserved in your history. You can revisit past fixes, review the AI's reasoning, and see exactly which principles were applied. It's not just a log—it's your personalized debugging textbook.
+
+![Debugging History](public/Screenshot/Debugging.png)
 
 ### 🔮 Déjà Vu Detection
 When you encounter an error you've seen before—across ANY project—Theseus recognizes it instantly using Jaccard similarity matching.
@@ -105,6 +109,8 @@ Track your growth as a debugger:
 ![Analytics Dashboard](public/Screenshot/Analytics.png)
 
 ### 🧩 The Clew Suite — One Platform, Five Tools
+
+**Athena Clew** is the unified ecosystem that connects these tools. It provides the shared memory (Firestore), the reasoning engine (Gemini 3), and the identity layer that allows "The Clew Suite" to work together as a cohesive AI team.
 
 | Tool | Status | Description |
 |------|--------|-------------|
