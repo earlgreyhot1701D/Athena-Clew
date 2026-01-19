@@ -2,9 +2,10 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /sessions/{sessionId} {
-      // Allow read/write for MVP (client-side sessionId matching)
+      // Allow get/write for MVP (client-side sessionId matching)
       // For V2: Add authentication check: request.auth != null
-      allow read, write: if true;
+      // BLOCKED: 'list' is implicitly denied to prevent enumeration
+      allow get, create, update, delete: if true;
       
       // Nested collections inherit parent permissions
       match /projects/{projectId} {
