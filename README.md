@@ -208,6 +208,20 @@ firestore/
 - Firebase CLI (`npm install -g firebase-tools`)
 - Google AI API Key (from [Google AI Studio](https://aistudio.google.com/))
 
+### 🔐 Security & Privacy Note
+
+You will notice a **Firebase API Key** in `public/firebase-config.js`.
+
+> **"Wait, is that safe?"**  
+> **YES.** In the Firebase Client SDK architecture, this key is an **identifier**, not a secret. It is designed to be public and embedded in client-side code.
+
+**How we secure it:**
+1.  **HTTP Referrer Restrictions**: The key is locked to run ONLY on our domains (e.g., `athena-clew.web.app`).
+2.  **API Scoping**: The key is restricted to access ONLY specifically required Google services (Firestore, Vertex AI).
+3.  **Security Rules**: Firestore database access is protected by strict server-side security rules (`firestore.rules`), not by hiding the key.
+
+*The sensitive `GEMINI_API_KEY` (if used for server-side operations) would be in `.env`, but Theseus uses the client-side specific Firebase AI Logic SDK.*
+
 ### Quick Start
 
 ```bash
