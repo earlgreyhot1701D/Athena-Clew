@@ -19,13 +19,13 @@ Powered by **Gemini 3 Deep Thinking**, it doesn't just patch code—it **extract
 
 ## 🚀 Live Demo
 
-**[Launch Athena Clew →](https://athena-clew-675122416902.us-central1.run.app/)**
+**[Launch Theseus Clew →](https://athena-clew-675122416902.us-central1.run.app/)**
 
 **[Watch the Demo Video →](https://youtu.be/LpWZUh1X-RU)**
 
 *Paste an error. Get intelligent analysis. Watch Theseus learn.*
 
-![Athena Clew Platform Screenshot](public/Screenshot/Athena%20Theseus%20Screen%20Shot.png)
+![Theseus Clew Platform Screenshot](public/Screenshot/Athena%20Theseus%20Screen%20Shot.png)
 
 ---
 
@@ -97,7 +97,7 @@ When you encounter an error you've seen before—across ANY project—Theseus re
 
 ![Cross Project Learning](public/Screenshot/Cross%20Project%20Learning.png)
 
-*"You've seen this before! In your React project 3 days ago, you fixed this by..."*
+*"You worked through this in your "backend" project on 1/18/2026:"*
 
 ### 📊 Personal Analytics Dashboard
 Track your growth as a debugger:
