@@ -331,6 +331,12 @@ Every feature started with:
 3. **Build minimum code** to pass tests
 4. **Verify** and iterate
 
+### 5. Simple Math > Over-Engineering
+For "Déjà Vu" detection, we could have used vector embeddings. Instead, we used **Jaccard Similarity** (set intersection):
+- **Embeddings**: 200ms latency, costs money, requires API call.
+- **Jaccard**: 0ms latency, free, runs on client.
+For an MVP, instant feedback loops beat "state-of-the-art" complexity every time.
+
 ### 5. Firebase AI Logic SDK Gotchas
 
 **Critical Discovery:** The Web SDK uses `camelCase`, not `snake_case`:
