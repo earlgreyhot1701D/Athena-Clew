@@ -108,7 +108,7 @@ Track your growth as a debugger:
 
 ![Analytics Dashboard](public/Screenshot/Analytics.png)
 
-### 🧩 The Clew Suite — One Platform, Five Tools
+### 🧩 The Athena Clew Suite — One Platform, Five Tools
 
 **Athena Clew** is the unified ecosystem that connects these tools. It provides the shared memory (Firestore), the reasoning engine (Gemini 3), and the identity layer that allows "The Clew Suite" to work together as a cohesive AI team.
 
