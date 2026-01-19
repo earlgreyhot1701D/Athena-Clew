@@ -99,7 +99,12 @@ When you encounter an error you've seen before—across ANY project—Theseus re
 
 *"You worked through this in your "backend" project on 1/18/2026:"*
 
-### 📊 Personal Analytics Dashboard
+### � Multi-Project Workspace
+Debug a Python script in the morning and a React app in the afternoon? No problem.
+- **Project Switching**: Create distinct workspaces (e.g., "portfolio-site", "backend-api") to keep your debugging history organized.
+- **Local Persistence**: Your session ID is stored in `localStorage`, so you can close the tab and pick up right where you left off. The actual data lives safely in Firestore.
+
+### �📊 Personal Analytics Dashboard
 Track your growth as a debugger:
 - **Error Type Breakdown** — See your most common challenges
 - **Cross-Project Learning** — Watch principles transfer between projects
@@ -332,7 +337,7 @@ Every feature started with:
 4. **Verify** and iterate
 
 ### 5. Simple Math > Over-Engineering
-For "Déjà Vu" detection, we could have used vector embeddings. Instead, we used **Jaccard Similarity** (set intersection):
+For "Learning Moment" detection, we could have used vector embeddings. Instead, we used **Jaccard Similarity** (set intersection):
 - **Embeddings**: 200ms latency, costs money, requires API call.
 - **Jaccard**: 0ms latency, free, runs on client.
 For an MVP, instant feedback loops beat "state-of-the-art" complexity every time.
