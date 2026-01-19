@@ -307,28 +307,28 @@ const UI = {
             : '';
 
         const html = `
-            <div class="mb-6 border-4 border-green-500 bg-green-50 p-6 animate-fade-in">
+            <div class="mb-6 border-4 border-purple-500 bg-purple-50 p-6 animate-fade-in shadow-craft">
                 <div class="flex items-start gap-3 mb-4">
-                    <span class="text-3xl">⏪</span>
+                    <span class="text-3xl">🔮</span>
                     <div class="flex-1">
-                        <h3 class="font-headline font-bold text-green-900 text-xl mb-2">LEARNING MOMENT!</h3>
-                        <p class="text-sm text-green-800 mb-4">
+                        <h3 class="font-headline font-bold text-purple-900 text-xl mb-2">✨ DÉJÀ VU!</h3>
+                        <p class="text-sm text-purple-900 mb-4">
                             You worked through this ${projectContext} on <strong>${fixDate}</strong>:
                         </p>
                         
-                        <div class="bg-white border-2 border-green-300 p-4 rounded mb-4">
+                        <div class="bg-white border-2 border-purple-300 p-4 rounded mb-4">
                             <p class="font-mono text-sm text-navy mb-3">"${similarFix.error.message}"</p>
                             
                             ${similarFix.fix?.solution ? `
-                                <div class="border-t-2 border-green-200 pt-3">
-                                    <p class="text-xs text-green-700 font-bold mb-2">✅ What worked:</p>
+                                <div class="border-t-2 border-purple-200 pt-3">
+                                    <p class="text-xs text-purple-700 font-bold mb-2">✅ What worked:</p>
                                     <p class="text-sm text-navy">${similarFix.fix.solution}</p>
                                 </div>
                             ` : ''}
                             
                             ${similarFix.principle?.principle ? `
-                                <div class="border-t-2 border-green-200 pt-3 mt-3">
-                                    <p class="text-xs text-green-700 font-bold mb-2">💡 What you learned:</p>
+                                <div class="border-t-2 border-purple-200 pt-3 mt-3">
+                                    <p class="text-xs text-purple-700 font-bold mb-2">💡 What you learned:</p>
                                     <p class="text-sm italic text-navy">"${similarFix.principle.principle}"</p>
                                 </div>
                             ` : ''}
@@ -339,7 +339,7 @@ const UI = {
                         <div class="flex gap-3 mt-4">
                             <button 
                                 id="btn-apply-fix"
-                                class="flex-1 bg-green-600 hover:bg-green-700 text-white font-headline font-bold py-3 px-4 border-3 border-green-700 transition">
+                                class="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-headline font-bold py-3 px-4 border-3 border-purple-700 transition shadow-sm">
                                 ✅ Apply This Solution
                             </button>
                             <button 
@@ -351,7 +351,7 @@ const UI = {
                     </div>
                 </div>
                 
-                <p class="text-xs text-green-700 italic mt-4">
+                <p class="text-xs text-purple-800 italic mt-4">
                     ${Math.round(similarFix.similarity * 100)}% similar - 
                     Theseus remembers your solutions and helps you apply them again!
                 </p>
