@@ -1,22 +1,76 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    
+    // --- Helper Functions ---
+    
+    // Check if a field is a string and within length limits
+    function isShortString(data, field) {
+      return data.get([field], '') is string && data.get([field], '').size() < 1000;
+    }
+    
+    function isLongString(data, field) {
+      return data.get([field], '') is string && data.get([field], '').size() < 20000;
+    }
+
+    // Validation for 'fixes' collection
+    function isValidFix() {
+       let data = request.resource.data;
+       // Required fields
+       return data.keys().hasAll(['error', 'fix']) &&
+              // Error validation
+              data.error is map && 
+              data.error.keys().hasAll(['message']) &&
+              data.error.message is string && data.error.message.size() < 20000 &&
+              // Fix validation
+              data.fix is map &&
+              data.fix.keys().hasAll(['solution']) &&
+              data.fix.solution is string && data.fix.solution.size() < 20000;
+    }
+
+    // Validation for 'principles' collection
+    function isValidPrinciple() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['principle', 'category']) &&
+             data.principle is string && data.principle.size() < 2000 &&
+             data.category is string && data.category.size() < 100;
+    }
+
+    // Immutability Check: Ensure core fields haven't changed during update
+    function isFixImmutable() {
+      // Allow updating userFeedback or metrics, but NOT the core error/fix content
+      return request.resource.data.error == resource.data.error &&
+             request.resource.data.fix == resource.data.fix;
+    }
+    
+    function isPrincipleImmutable() {
+      return request.resource.data.principle == resource.data.principle;
+    }
+
+    // --- Rules ---
+
     match /sessions/{sessionId} {
-      // Allow get/write for MVP (client-side sessionId matching)
-      // For V2: Add authentication check: request.auth != null
-      // BLOCKED: 'list' is implicitly denied to prevent enumeration
-      allow get, create, update, delete: if true;
+      // Sessions: Allow create/update/get. DENY delete (by omission).
+      // Implicitly deny 'list' on root (no /sessions match).
+      allow get, create, update: if true;
       
-      // Nested collections inherit parent permissions
+      // Nested collections inherit nothing, must be explicit
       match /projects/{projectId} {
-        allow read, write: if true;
+        // Projects: Read (get+list), Create, Update. DENY delete.
+        allow read, create, update: if true;
         
         match /fixes/{fixId} {
-          allow read, write: if true;
+          allow read: if true;
+          allow create: if isValidFix();
+          allow update: if isValidFix() && isFixImmutable();
+          // Delete is DENIED
         }
         
         match /principles/{principleId} {
-          allow read, write: if true;
+          allow read: if true;
+          allow create: if isValidPrinciple();
+          allow update: if isValidPrinciple() && isPrincipleImmutable();
+          // Delete is DENIED
         }
       }
     }
