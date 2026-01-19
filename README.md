@@ -13,6 +13,8 @@ Most AI coding assistants treat every error like it's the first time they've see
 
 **Theseus** is an autonomous agent that **learns from your debugging sessions**.
 
+<img src="public/Screenshot/Theseus%20Clew.png" width="150" align="right" alt="Theseus Clew Agent">
+
 Powered by **Gemini 3 Deep Thinking**, it doesn't just patch code—it **extracts reusable principles** from your fixes and stores them in a long-term knowledge graph. When you encounter a similar error later (even in a different project), Theseus shouts **"Learning Moment!"** and reminds you how you solved it last time. Autonomous refers to the agent’s ability to reason, recall, and learn independently — not to automatically modifying code.
 
 ---
