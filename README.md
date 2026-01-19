@@ -1,20 +1,19 @@
-# 🏛️ Athena Clew Platform
+# 🚀 Theseus Clew | Autonomous Debugging with Gemini 3 Deep Thinking
 
-> **Your AI debugger that learns YOU, not just code.**
-
-[![Gemini 3 Hackathon](https://img.shields.io/badge/Gemini_3-Hackathon_2026-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://devpost.com/software/athena-clew)
-[![Firebase](https://img.shields.io/badge/Firebase-v12.6.0-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com/)
-[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+> **The AI that remembers what you fix.**  
+> *Part of the Athena Clew Ecosystem.*
 
 ---
 
-## 🎯 What is Athena Clew?
+## 🎯 The Problem: AI "Amnesia"
 
-**Athena Clew** is a unified platform for **vibe coders**—developers who learn by doing, not by reading docs. At its core is **Theseus Clew**, an autonomous debugging agent powered by **Gemini 3 Deep Thinking** that doesn't just fix errors—it learns *your* patterns, extracts reusable principles, and gets smarter with every debugging session.
+Most AI coding assistants treat every error like it's the first time they've seen it. You explain the context, fix the bug, and move on. When the bug happens again a week later, the AI has forgotten everything.
 
-**The Problem:** Every AI coding assistant treats you like a stranger. You explain the same concepts, make the same mistakes, and get the same generic advice—over and over.
+## 🧠 The Solution: Theseus Clew
 
-**The Solution:** Theseus remembers. It extracts debugging principles from your successful fixes, detects "déjà vu" moments when you've seen similar errors before, and applies cross-project knowledge automatically.
+**Theseus** is an autonomous agent that **learns from your debugging sessions**.
+
+Powered by **Gemini 3 Deep Thinking**, it doesn't just patch code—it **extracts reusable principles** from your fixes and stores them in a long-term knowledge graph. When you encounter a similar error later (even in a different project), Theseus shouts **"Déjà Vu!"** and reminds you how you solved it last time.
 
 ---
 
@@ -37,7 +36,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    THESEUS 5-STEP PIPELINE                     │
+│                    THESEUS 5-STEP PIPELINE                      │
 └─────────────────────────────────────────────────────────────────┘
 
  INPUT: User pastes error message
@@ -122,25 +121,25 @@ Track your growth as a debugger:
 │                     ATHENA CLEW PLATFORM                        │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐      │
-│  │   Browser    │    │   Gemini 3   │    │  Firestore   │      │
-│  │  (Vanilla JS)│◄──►│  Flash API   │◄──►│  Database    │      │
-│  │              │    │              │    │              │      │
-│  │ • index.html │    │ • Analyze    │    │ • Sessions   │      │
-│  │ • app.js     │    │ • Extract    │    │ • Projects   │      │
-│  │ • ui.js      │    │ • Rank       │    │ • Fixes      │      │
-│  │ • gemini.js  │    │              │    │ • Principles │      │
-│  └──────────────┘    └──────────────┘    └──────────────┘      │
+│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐       │
+│  │   Browser    │    │   Gemini 3   │    │  Firestore   │       │
+│  │  (Vanilla JS)│◄──►│  Flash API   │◄──►│  Database    │       │
+│  │              │    │              │    │              │       │
+│  │ • index.html │    │ • Analyze    │    │ • Sessions   │       │
+│  │ • app.js     │    │ • Extract    │    │ • Projects   │       │
+│  │ • ui.js      │    │ • Rank       │    │ • Fixes      │       │
+│  │ • gemini.js  │    │              │    │ • Principles │       │
+│  └──────────────┘    └──────────────┘    └──────────────┘       │ 
 │                                                                 │
-│  ┌─────────────────────────────────────────────────────────┐   │
-│  │                    DATA FLOW                            │   │
-│  │                                                         │   │
-│  │  Error Input ──► Step 1 (AI) ──► Step 2 (DB) ──►       │   │
-│  │  Step 3 (AI) ──► Step 4 (AI+DB) ──► Step 5 (DB)        │   │
-│  │                                                         │   │
-│  │  AI = Gemini 3 Deep Thinking                           │   │
-│  │  DB = Firestore Queries                                │   │
-│  └─────────────────────────────────────────────────────────┘   │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │                    DATA FLOW                            │    │
+│  │                                                         │    │
+│  │  Error Input ──► Step 1 (AI) ──► Step 2 (DB) ──►        │    │
+│  │  Step 3 (AI) ──► Step 4 (AI+DB) ──► Step 5 (DB)         │    │
+│  │                                                         │    │
+│  │  AI = Gemini 3 Deep Thinking                            │    │
+│  │  DB = Firestore Queries                                 │    │
+│  └─────────────────────────────────────────────────────────┘    │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -412,7 +411,7 @@ Athena-Clew/
 
 ## 👩‍💻 Author
 
-**Shara Cordero** — Builder of the Clew Suite
+**La Shara Cordero** — Builder of the Clew Suite
 
 - 🏆 [AWS Global Vibe Hackathon 2025 Winner](https://dorahacks.io/hackathon/awsvibecoding/winner) (Janus Clew)
 - 🎓 Draper University Cohort 2026 Scholarship Recipient
@@ -430,12 +429,12 @@ MIT License — See [LICENSE](LICENSE) for details.
 ## 🙏 Acknowledgments
 
 - **Google DeepMind** — For Gemini 3 and this incredible hackathon opportunity
-- **Firebase Team** — For the AI Logic SDK and amazing developer experience
+- **Firebase** — For the AI Logic SDK and amazing developer experience
 - **The Vibe Coding Community** — For proving that learning by building is valid
 
 ### 🤖 Built With AI Assistance
 
-This project was built with **Claude (Anthropic)** and **AntiGravity** as AI co-pilots. As a six-person team of one, all architectural decisions, debugging choices, and mistakes are mine. 
+This project was built with **Claude (Anthropic)** and **AntiGravity** as AI co-pilots. All architectural decisions, debugging choices, and mistakes are mine. 
 
 **Human-approved. AI-assisted.** Every line was reviewed, understood, and intentionally shipped.
 
